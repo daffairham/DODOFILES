@@ -1,37 +1,42 @@
+<div class="md:flex flex-row gap-20 items-center">
+  <h1 class="mt-2 ml-6 font-semibold text-xl">My Files</h1>
+</div>
 <div id="fileList" class="mt-6 ml-6 md:grid grid-cols-8 gap-4">
   <% fileList.forEach((file, index)=> { %>
     <div class="file-item bg-white p-4 rounded-md shadow-lg hover:bg-gray-200 flex items-center relative">
       <div class="flex-grow-0 mr-4">
         <% if (!file.isDirectory) { %>
-          <a href="download?filename=<%= file.name %>" class="file-link">
+          <a href="download?filename=<%= file.file_name %>" class="file-link">
             <i class="fa fa-file text-l" aria-hidden="true"></i>
           </a>
         <% } else { %>
-          <a href="folder?foldername=<%= file.name %>" hx-target="#content" hx-boost="true" class="folder-link">
+          <a href="folder?foldername=<%= file.file_name %>" hx-target="#content" hx-boost="true" class="folder-link">
             <i class="fa fa-folder text-l" aria-hidden="true"></i>
           </a>
         <% } %>
       </div>
       <div class="flex-grow truncate text-l font-semibold">
         <% if (!file.isDirectory) { %>
-          <a href="download?filename=<%= file.name %>" class="file-link">
-            <%= file.name %>
+          <a href="download?filename=<%= file.file_name %>" class="file-link">
+            <%= file.file_name %>
           </a>
+          <input type="hidden" name="filename" id="filename" value="<%= file.file_name %>">
         <% } else { %>
-          <a href="folder?foldername=<%= file.name %>" hx-target="#content" hx-boost="true" class="folder-link">
-            <%= file.name %>
+          <a href="folder?foldername=<%= file.file_name %>" hx-target="#content" hx-boost="true" class="folder-link">
+            <%= file.file_name %>
           </a>
+          <input type="hidden" name="filename" id="filename" value="<%= file.file_name %>">
         <% } %>
       </div>
       <div class="flex-shrink-0 relative">
-        <button class="option-btn flex items-center justify-center bg-gray-200 rounded-md w-8 h-8"
+        <button class="option-btn flex items-center justify-center hover:bg-gray-500 rounded-md w-8 h-8"
           onclick="toggleDropdown(this, <%= index %>)">
           <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
         </button>
         <div class="dropdown hidden absolute mt-2 w-48 z-10 bg-white rounded-md shadow-lg" id="dropdown<%= index %>">
-          <button onclick="openRenameModal(<%= index %>)" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Rename</button>
+          <button onclick="openRenameModal(<%= index %>)" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" hx-trigger="">Rename</button>
           <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Move file</button>
-          <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Delete</button>
+          <button hx-get="/delete?filename=<%= file.name %>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 val" hx-boost="true">Move to recycle bin</button>
         </div>
       </div>
     </div>

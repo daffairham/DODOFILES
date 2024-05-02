@@ -2,9 +2,8 @@
     class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
     <div class="modal-content bg-white rounded-lg p-8 md:flex flex-col w-1/4">
         <span class="text-center mb-4">Rename</span>
-        <form id="uploadForm" hx-post="/rename" hx-target="#content" class="flex flex-col gap-2"
+        <form id="rename" hx-post="/rename" hx-target="#content" class="flex flex-col gap-2"
             onsubmit="closeRenameModal()">
-            <input type="hidden" value="<%= file.name %>">
             <input type="text" value="Joko" name="newName" id="newName" class="p-2 border-black bg-gray-100 rounded-sm">
             <input type="submit" value="Rename"
                 class="bg-gray-500 hover:bg-gray-700 cursor-pointer text-white font-bold py-2 px-4 rounded" />

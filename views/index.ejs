@@ -10,13 +10,14 @@
   <script src="https://unpkg.com/htmx.org@1.9.10"
     integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
     crossorigin="anonymous"></script>
-  <title>Fileman</title>
+  <title>DODOFILES</title>
 </head>
 <div id="sidebar" class="md:flex flex-col fixed -left-1 top-0 z-50 h-full w-52 rounded-md bg-white p-4 shadow-sm">
   <a href="/">
-    <span class="ml-3 text-lg font-semibold text-black">Fileman</span>
+    <span class="ml-3 text-lg font-semibold text-black">DODOFILES</span>
   </a>
   <button onclick="openModal()" class="bg-gray-500 rounded-full p-4 mx-auto text-white text-m font-semibold hover:bg-gray-700 mt-4">Upload a file</button>
+  <button hx-get="/recycle-bin" hx-target="#content" class="text-center mt-4 p-2 w-3/4 hover:bg-gray-200">Recycle Bin</button>
 </div>
 
 <main class="main min-h-screen w-full bg-gray-100 transition-all md:ml-[12rem] md:w-[calc(100%-192px)]">
@@ -27,18 +28,14 @@
     <ul class="ml-auto flex items-center">
       <li class="dropdown ml-3">
         <button type="button" class="dropdown-toggle flex items-center">
-          <span>User</span>
+          <span><%= userData.username %></span>
         </button>
       </li>
     </ul>
   </div>
 
-  <!-- content -->
+  <!-- konten file -->
   <div class="p-4">
-    <div class="md:flex flex-row gap-20 items-center">
-      <h1 class="mt-2 ml-6 font-semibold text-xl">My Files</h1>
-    </div>
-
     <div id="content">
       <%- include('parts/fileList.ejs') %>
     </div>
@@ -46,6 +43,9 @@
     <div id="upload-modal" class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
       <%- include('parts/uploadModal.ejs') %>
     </div>
+  </div>
+
+    
 </main>
 </body>
 </html>

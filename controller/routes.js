@@ -3,75 +3,79 @@ const fs = require("fs");
 const router = express.Router();
 const path = require("path");
 
-let currentDir = "filedir"; //untuk nyimpan folder apa yang lagi dibuka
+let currentDir = "filedir";
+
+const readDirectory = (directory, callback) => {
+  const directoryPath = path.join(__dirname, "..", directory);
+
+  fs.readdir(directoryPath, { withFileTypes: true }, (err, files) => {
+    if (err) {
+      callback(err, null);
+    } else {
+      const fileList = files.map((file) => ({
+        name: file.name,
+        isDirectory: file.isDirectory(),
+      }));
+      callback(null, fileList);
+    }
+  });
+};
+
+const saveFile = (file, directory, callback) => {
+  const fileName = file.name;
+  const filePath = path.join(__dirname, "..", directory, fileName);
+
+  fs.writeFile(filePath, file.data, (err) => {
+    if (err) {
+      callback(err);
+    } else {
+      console.log("Uploaded into: " + filePath);
+      callback(null);
+    }
+  });
+};
 
 router.get("/", (req, res) => {
-  const fileDir = path.join(__dirname, "..", "filedir") || "";
-  fs.readdir(fileDir, { withFileTypes: true }, (err, files) => {
+  readDirectory('filedir', (err, fileList) => {
     if (err) {
       throw err;
     }
-    const fileList = files.map((file) => ({
-      name: file.name,
-      isDirectory: file.isDirectory(),
-    }));
-
-    res.render("index", { fileList, fileDir });
+    res.render("index", { fileList, fileDir: currentDir });
   });
+  currentDir = "filedir";
+});
+
+router.get("/recycle-bin", (req, res) => {
+  readDirectory('recyclebin', (err, fileList) => {
+    if (err) {
+      throw err;
+    }
+    res.render("parts/recycleBin", { fileList, fileDir: currentDir });
+  });
+  currentDir = "filedir";
 });
 
 router.post("/upload", (req, res) => {
-  const file = req.files;
-  const fileName = file.file.name;
-  let uploads = "";
-  let dir = "";
-  if (currentDir === "") {
-    uploads = path.join(__dirname, "..", "filedir", fileName);
-    dir = path.join(__dirname, "..", "filedir");
-  } else {
-    uploads = path.join('filedir', currentDir, fileName);
-    dir = path.join(__dirname, "..", "filedir");
-  }
+  const file = req.files.file;
 
-  fs.writeFile(uploads, file.file.data, (err, data) => {
+  saveFile(file, currentDir, (err) => {
     if (err) {
       throw err;
-    } else {
-      fs.readdir(dir, { withFileTypes: true }, (err, files) => {
-        if (err) {
-          throw err;
-        }
-        const fileList = files.map((file) => ({
-          name: file.name,
-          isDirectory: file.isDirectory(),
-        }));
-        if (currentDir === "") {
-          res.render("index", { fileList });
-        } else {
-          res.render("parts/inside-folder", {
-            fileList,
-            folderName: currentDir,
-            fileName: file.name
-          });
-        }
-      });
     }
-    console.log("Uploaded into: " + uploads);
+    readDirectory(currentDir, (err, fileList) => {
+      if (err) {
+        throw err;
+      }
+      res.render("parts/fileList", { fileList, fileDir: currentDir });
+    });
   });
 });
 
 router.get("/download", (req, res) => {
-  console.log(currentDir);
   const fileName = req.query.filename;
-  let filePath = "";
-  if(currentDir !== "filedir"){
-    filePath = path.join(__dirname, "..", "filedir", fileName);
-    console.log(filePath);
-  } else{
-    filePath = path.join(__dirname, "..", "filedir", fileName);
-  }
+  const filePath = path.join(__dirname, "..", currentDir, fileName);
 
-  res.download(filePath, (err, res) => {
+  res.download(filePath, (err) => {
     if (err) {
       throw err;
     }
@@ -79,63 +83,52 @@ router.get("/download", (req, res) => {
 });
 
 router.get("/folder", (req, res) => {
-  const folderName = req.query.foldername;
-  const fileDir = path.join(__dirname, "..", "filedir", folderName);
-  console.log("current directory: " + currentDir);
-  fs.readdir(fileDir, { withFileTypes: true }, (err, files) => {
+  currentDir += '\\' + req.query.foldername;
+  readDirectory(currentDir, (err, fileList) => {
     if (err) {
       throw err;
     }
-    const fileList = files.map((file) => ({
-      name: file.name,
-      isDirectory: file.isDirectory(),
-    }));
-
-    res.render("parts/inside-folder", { fileList, folderName, fileDir });
+    res.render("parts/fileList", { fileList, fileDir: currentDir });
   });
-  currentDir = folderName;
-  
 });
 
 router.get("/delete", (req, res) => {
   const fileName = req.query.filename;
-  const filePath = path.join(currentDir, fileName);
+  console.log("filename: " + fileName);
+  const oldPath = path.join(__dirname, "..", "filedir", fileName);
+  const newPath = path.join(__dirname, "..", "recyclebin", fileName);
 
-  console.log("filePath: " + filePath);
+  fs.rename(oldPath, newPath, (err)=>{
+    if(err){
+      throw err
+    }
+    else{
+      res.send("Move Succesful")
+    }
+  })
+});
 
-  // fs.unlink(filePath, (err) => {
-  //   if (err) {
-  //     throw err;
-  //   }
-  //   console.log(`File ${fileName} deleted`);
-  //   res.redirect("/");
-  // });
+router.get("/deleteFromSystem", (req, res) => {
+  const fileName = req.query.filename;
+  console.log("filename: " + fileName);
 });
 
 router.post("/rename", (req, res) => {
   const oldName = req.body.oldName;
   const newName = req.body.newName;
-  const oldFilePath = path.join(currentDir, oldName);
-  const newFilePath = path.join(currentDir, newName);
+  const oldFilePath = path.join(__dirname, "..", currentDir, oldName);
+  const newFilePath = path.join(__dirname, "..", currentDir, newName);
 
   fs.rename(oldFilePath, newFilePath, (err) => {
     if (err) {
       throw err;
     }
     console.log(`File ${oldFilePath} renamed to ${newName}`);
-    fs.readdir(currentDir, { withFileTypes: true }, (err, files) => {
+    readDirectory(currentDir, (err, fileList) => {
       if (err) {
         throw err;
       }
-      const fileList = files.map((file) => ({
-        name: file.name,
-        isDirectory: file.isDirectory(),
-      }));
-      if (currentDir === "") {
-        res.render("parts/fileList", { fileList });
-      } else {
-        res.render("parts/inside-folder", { fileList, folderName: currentDir });
-      }
+      res.render("parts/fileList", { fileList, fileDir: currentDir });
     });
   });
 });
