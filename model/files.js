@@ -71,7 +71,7 @@ const createFolder = (filename, uploadDate, parent, fileOwner, callback) => {
 const getFilesInRoot = (userId, callback) => {
   const query = `SELECT * 
                 FROM files
-                WHERE file_owner = $1 AND deleted_date IS NULL`;
+                WHERE file_owner = $1 AND deleted_date IS NULL AND parent IS NULL`;
   db.query(query, [userId], (err, res) => {
     if (err) {
       console.error("Error:", err);
@@ -85,7 +85,7 @@ const getFilesInRoot = (userId, callback) => {
 const getFilesInFolder = (userId, folder, callback) => {
   const query = `SELECT * 
                 FROM files
-                WHERE file_owner = $1 AND parent = $2`;
+                WHERE file_owner = $1 AND parent = $2 AND deleted_date IS NULL`;
   db.query(query, [userId, folder], (err, res) => {
     if (err) {
       console.error("Error:", err);
@@ -119,10 +119,51 @@ const moveToBin = (fileName, ownerId, callback) => {
       console.error("Error:", err);
       callback(err, null);
     } else {
-      const message = `${res.rowCount} file moved to bin successfully`;
-      console.log(message);
-      console.log(res);
+      const message = ``;
       callback(null, message);
+    }
+  });
+};
+
+const moveFile = (fileName, folderDestination, callback) => {
+  const query = `UPDATE files
+                  SET parent = $1
+                  WHERE file_name = '${fileName}'`;
+  db.query(query, [folderDestination], (err, res) => {
+    if (err) {
+      console.error("Error:", err);
+      callback(err, null);
+    } else {
+      const message = ``;
+      callback(null, message);
+    }
+  });
+};
+
+const getUserFolder = (userId, callback)=>{
+  const query = `SELECT file_name
+                FROM files
+                WHERE file_owner = $1 AND is_folder = TRUE`
+  db.query(query, [userId], (err, res)=>{
+    if(err){
+      console.error("Error: ", err);
+    }
+    else{
+      callback(null, res.rows);
+    }
+  })
+}
+
+const getFolderName = (userId, folderId, callback) => {
+  const query = `SELECT file_name 
+  FROM files
+  WHERE file_owner = $1 AND file_id = $2 and deleted_date IS NULL`;
+  db.query(query, [userId, folderId], (err, res) => {
+    if (err) {
+      console.error("Error:", err);
+      callback(err, null);
+    } else {
+      callback(null, res);
     }
   });
 };
@@ -136,7 +177,7 @@ const restoreFromBin = (fileName, ownerId, callback) => {
       console.error("Error:", err);
       callback(err, null);
     } else {
-      const message = `${res.rowCount} file restored`;
+      const message = ``;
       callback(null, message);
     }
   });
@@ -150,5 +191,8 @@ module.exports = {
   getFilesInFolder,
   getDeletedFiles,
   moveToBin,
-  restoreFromBin
+  restoreFromBin,
+  getFolderName,
+  moveFile,
+  getUserFolder,
 };

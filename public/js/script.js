@@ -14,6 +14,14 @@ function closeRenameModal(index) {
   document.getElementById(`rename-modal${index}`).classList.add("hidden");
 }
 
+function openMoveFileModal(index) {
+  document.getElementById(`move-file-modal${index}`).classList.remove("hidden");
+}
+
+function closeMoveFileModal(index) {
+  document.getElementById(`move-file-modal${index}`).classList.add("hidden");
+}
+
 function toggleDropdown(button, index) {
   const allDropdowns = document.querySelectorAll('.dropdown');
   allDropdowns.forEach(dropdown => {

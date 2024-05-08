@@ -4,45 +4,53 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="css/output.css" />
-  <link rel="stylesheet" href="css/htmx.css" />
-  <script src="js/script.js"></script>
+  <link rel="stylesheet" href="/css/output.css" />
+  <link rel="stylesheet" href="/css/htmx.css" />
+  <script src="/js/script.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <script src="https://unpkg.com/htmx.org@1.9.10"
     integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
     crossorigin="anonymous"></script>
-  <title>DODOFILES</title>
+  <% if (folderName==="" ) { %>
+    <title>Your Files | DODOFILES</title>
+    <% } else { %>
+      <title>
+        <%= folderName %> | DODOFILES
+      </title>
+      <% } %>
 </head>
 
 <%- include('parts/sidebar.ejs') %>
 
-<main class="main min-h-screen w-full bg-gray-100 transition-all md:ml-[12rem] md:w-[calc(100%-192px)]">
-  <div class="sticky left-0 top-0 z-30 flex items-center bg-white px-6 py-2 shadow-md shadow-black/5">
-    <div class="ml-4 flex items-center text-sm">
-      <input type="text" name="" id="" class="w-72 rounded-xl bg-gray-200 p-[0.3rem]" placeholder="Search a file.." />
-    </div>
-    <ul class="ml-auto flex items-center">
-      <li class="dropdown ml-3 md:flex flex-row">
-        <button type="button" class="dropdown-toggle flex items-center">
-          <span>Hi, <%= userData.username %></span>
-        </button>
-        <a class="ml-2" href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i></a>
-      </li>
-    </ul>
-  </div>
-
-  <!-- konten file -->
-  <div class="p-4">
-    <div id="content">
-      <%- include('parts/fileList.ejs') %>
+  <main class="main min-h-screen w-full bg-gray-100 transition-all md:ml-[12rem] md:w-[calc(100%-192px)]">
+    <div class="sticky left-0 top-0 z-30 flex items-center bg-white px-6 py-2 shadow-md shadow-black/5">
+      <div class="ml-4 flex items-center text-sm">
+        <input type="text" name="" id="" class="w-72 rounded-xl bg-gray-200 p-[0.3rem]" placeholder="Search a file.." />
+      </div>
+      <ul class="ml-auto flex items-center">
+        <li class="dropdown ml-3 md:flex flex-row">
+          <button type="button" class="dropdown-toggle flex items-center">
+            <span>Hi, <%= userData.username %></span>
+          </button>
+          <a class="ml-2" href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i></a>
+        </li>
+      </ul>
     </div>
 
-    <div id="upload-modal" class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
-      <%- include('parts/uploadModal.ejs') %>
-    </div>
-  </div>
+    <!-- konten file -->
+    <div class="p-4">
+      <div id="content">
+        <%- include('parts/fileList.ejs') %>
+      </div>
 
-    
-</main>
-</body>
+      <div id="upload-modal"
+        class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
+        <%- include('parts/uploadModal.ejs') %>
+      </div>
+    </div>
+
+
+  </main>
+  </body>
+
 </html>

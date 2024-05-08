@@ -7,14 +7,17 @@ const jwt = require("../config/jwt.js");
 
 router.get("/home", jwt.authenticate, (req, res)=>{
   const userData = req.user;
-  const userId = userData.user_id;
+  const userId = jwt.getIdFromToken(req.cookies.token);
   files.getFilesInRoot(userId, (err, fileList)=>{
     if(err){
       console.log(err);
     }
     else{
-      res.cookie("userId", userId); 
-      res.render('index', {fileList, userData});
+      files.getUserFolder(userId, (err, folderList)=>{
+        if(err);
+        console.error(err);
+      })
+      res.render('index', {fileList, userData, folderName: ""});
     }
   });
 });
@@ -27,7 +30,7 @@ router.get("/bin", jwt.authenticate, (req, res)=>{
       console.log(err);
     }
     else{
-      res.render('parts/recycleBin', {fileList, userData});
+      res.render('bin', {fileList, userData});
     }
   });
 });

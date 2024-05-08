@@ -36,7 +36,6 @@ router.post("/login", (req, res) => {
                 secure: true,
               });
               res.redirect("/home");
-              console.log(token);
             } else {
               console.log("Invalid password");
               res.redirect("/");

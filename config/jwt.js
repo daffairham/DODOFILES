@@ -12,6 +12,10 @@ const verifyToken = (token) => {
   return jwt.verify(token, secretKey);
 };
 
+const getIdFromToken = (token) =>{
+  return verifyToken(token).user_id;
+}
+
 const authenticate = async (req, res, next) => {
   const token = req.cookies.token;
   try {
@@ -30,4 +34,4 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-module.exports = {generateToken, verifyToken, authenticate};
+module.exports = {generateToken, verifyToken, authenticate, getIdFromToken};
