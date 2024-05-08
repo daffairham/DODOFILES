@@ -1,0 +1,4 @@
+.items.htmx-swapping {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}

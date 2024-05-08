@@ -17,10 +17,16 @@ const authenticate = async (req, res, next) => {
   try {
     const verify = await verifyToken(token);
     req.user = verify;
+    if (req.originalUrl === "/" && req.user) {
+      return res.redirect("/home");
+    }
     next();
   } catch (error) {
     res.clearCookie("token");
-    res.redirect("/");
+    if (req.originalUrl === "/home") {
+      return res.redirect("/");
+    }
+    next();
   }
 };
 

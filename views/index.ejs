@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/output.css" />
+  <link rel="stylesheet" href="css/htmx.css" />
   <script src="js/script.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <script src="https://unpkg.com/htmx.org@1.9.10"
@@ -12,13 +13,8 @@
     crossorigin="anonymous"></script>
   <title>DODOFILES</title>
 </head>
-<div id="sidebar" class="md:flex flex-col fixed -left-1 top-0 z-50 h-full w-52 rounded-md bg-white p-4 shadow-sm">
-  <a href="/">
-    <span class="ml-3 text-lg font-semibold text-black">DODOFILES</span>
-  </a>
-  <button onclick="openModal()" class="bg-gray-500 rounded-full p-4 mx-auto text-white text-m font-semibold hover:bg-gray-700 mt-4">Upload a file</button>
-  <button hx-get="/recycle-bin" hx-target="#content" class="text-center mt-4 p-2 w-3/4 hover:bg-gray-200">Recycle Bin</button>
-</div>
+
+<%- include('parts/sidebar.ejs') %>
 
 <main class="main min-h-screen w-full bg-gray-100 transition-all md:ml-[12rem] md:w-[calc(100%-192px)]">
   <div class="sticky left-0 top-0 z-30 flex items-center bg-white px-6 py-2 shadow-md shadow-black/5">
@@ -26,10 +22,11 @@
       <input type="text" name="" id="" class="w-72 rounded-xl bg-gray-200 p-[0.3rem]" placeholder="Search a file.." />
     </div>
     <ul class="ml-auto flex items-center">
-      <li class="dropdown ml-3">
+      <li class="dropdown ml-3 md:flex flex-row">
         <button type="button" class="dropdown-toggle flex items-center">
-          <span><%= userData.username %></span>
+          <span>Hi, <%= userData.username %></span>
         </button>
+        <a class="ml-2" href="/logout"><i class="fa fa-sign-out" aria-hidden="true"></i></a>
       </li>
     </ul>
   </div>

@@ -40,3 +40,21 @@ window.onclick = function (event) {
     closeModal();
   }
 };
+
+//tutup modal kalau klik elemen selain
+window.addEventListener('click', function(event) {
+
+  for (let i = 0; i < fileList.length; i++) {
+    const renameModal = document.getElementById(`rename-modal${i}`);
+    if (event.target !== renameModal && !renameModal.contains(event.target)) {
+      closeRenameModal(i);
+    }
+  }
+
+  if (!event.target.classList.contains('option-btn') && !event.target.closest('.dropdown')) {
+    const allDropdowns = document.querySelectorAll('.dropdown');
+    allDropdowns.forEach(dropdown => {
+      dropdown.classList.add('hidden');
+    });
+  }
+});
