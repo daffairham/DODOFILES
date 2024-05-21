@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= results[0].file_name %> | DODOFILES</title>
+    <link rel="stylesheet" href="/css/output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+</head>
+<body class="bg-gray-300">
+    <div id="navbar" class="bg-blue-600 md:flex md:flex-row md:justify-between md:p-4 rounded-b-md">
+        <div class="font-semibold text-white"><%= results[0].file_name %></div>
+        <div id="empty"></div>
+        <div id="right-icons">
+            <button><a href="/download/?filename=<%= results[0].file_name %>"><i class="fa fa-download text-white" aria-hidden="true"></i></a></button>
+        </div>
+    </div>
+
+    <div class="container md:mx-auto md:flex flex-col mt-8 md:mt-44 justify-center items-center">
+        <div class="bg-gray-200 px-4 py-8 md:px-8 md:py-12 rounded-md shadow-xl w-full md:w-1/2 mx-auto items-center justify-center">
+            <div id="file-details" class="text-gray-700">
+                <h2 class="text-2xl font-bold mb-4">File Details</h2>
+                <div class="mb-2">
+                    <span class="font-semibold">File Name:</span>
+                    <span id="file-name"><%= results[0].file_name %></span>
+                </div>
+                <div class="mb-2">
+                    <span class="font-semibold">File Size:</span>
+                    <span id="file-size"><%= size %></span>
+                </div>
+                <div class="mb-2">
+                    <span class="font-semibold">Upload Date:</span>
+                    <span id="upload-date"><%= results[0].upload_date %></span>
+                </div>
+                <div class="mt-4">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        <a href="/download/?filename=<%= results[0].file_name %>">Download</a>
+                        
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

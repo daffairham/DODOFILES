@@ -22,6 +22,14 @@ function closeMoveFileModal(index) {
   document.getElementById(`move-file-modal${index}`).classList.add("hidden");
 }
 
+function openShareFileModal(index) {
+  document.getElementById(`share-file-modal${index}`).classList.remove("hidden");
+}
+
+function closeShareFileModal(index) {
+  document.getElementById(`share-file-modal${index}`).classList.add("hidden");
+}
+
 function toggleDropdown(button, index) {
   const allDropdowns = document.querySelectorAll('.dropdown');
   allDropdowns.forEach(dropdown => {

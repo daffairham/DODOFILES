@@ -6,9 +6,7 @@
     <div class="items file-item<%= index %> bg-white p-4 rounded-md shadow-lg hover:bg-gray-200 flex items-center relative">
       <div class="flex-grow-0 mr-4">
         <% if (!file.is_folder) { %>
-          <a href="download?filename=<%= file.file_name %>" class="file-link">
             <i class="fa fa-file text-l" aria-hidden="true"></i>
-          </a>
           <% } else { %>
             <a href="folder?foldername=<%= file.file_name %>" hx-target="#content" hx-boost="true" class="folder-link">
               <i class="fa fa-folder text-l" aria-hidden="true"></i>
@@ -17,14 +15,14 @@
       </div>
       <div class="flex-grow truncate text-l font-semibold">
         <% if (!file.is_folder) { %>
-          <a href="download?filename=<%= file.file_name %>" class="file-link">
+          <span class="file-link">
             <%= file.file_name %>
-          </a>
+          </span>
           <input type="hidden" name="filename" id="filename" value="<%= file.file_name %>">
           <% } else { %>
-            <a href="folder?foldername=<%= file.file_name %>" hx-target="#content" hx-boost="true" class="folder-link">
+            <span class="folder-link">
               <%= file.file_name %>
-            </a>
+            </span>
             <input type="hidden" name="filename" id="filename" value="<%= file.file_name %>">
             <% } %>
       </div>

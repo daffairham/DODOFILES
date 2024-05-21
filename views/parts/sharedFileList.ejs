@@ -1,6 +1,6 @@
 <div class="md:flex flex-row gap-20 items-center">
   <% if (folderName==="" ) { %>
-    <h1 class="mt-2 ml-6 font-semibold text-xl">My Files</h1>
+    <h1 class="mt-2 ml-6 font-semibold text-xl">Files shared with me</h1>
     <% } else { %>
       <h1 class="mt-2 ml-6 font-semibold text-xl">
         <%= folderName %>
@@ -40,18 +40,14 @@
             <% } %>
               <button onclick="openRenameModal(<%= index %>)" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                 hx-trigger="">Rename</button>
-              <button onclick="openMoveFileModal(<%= index %>)"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Move file</button>
-              <button hx-post="/delete?filename=<%= file.file_name %>" hx-target=".file-item<%= index %>"
-                hx-swap="outerHTML swap:0.5s" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 val">Move
-                to recycle bin</button>
-              <button onclick="openShareFileModal(<%= index %>)"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Share</button>
+              <button disabled
+                class="block px-4 py-2 text-sm text-gray-300">Move file</button>
+              <button hx-post="/removeSharedFile?filename=<%= file.file_name %>" hx-target=".file-item<%= index %>"
+                hx-swap="outerHTML swap:0.5s" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 val">Remove</button>
         </div>
       </div>
     </div>
     <%- include('renameModal.ejs', {index, file}) %>
-      <%- include('moveFileModal.ejs', {index, file}) %>
-        <%- include('shareFileModal.ejs', {index, file}) %>
-          <% }) %>
+
+        <% }) %>
 </div>

@@ -1,7 +1,15 @@
 <div class="modal-content bg-white rounded-lg p-8 md:flex flex-col">
-  <span class="text-center mb-4">Upload file</span>
-  <form id="uploadForm" hx-post="/upload" hx-encoding="multipart/form-data" hx-target="#content" class="flex flex-col gap-2" onsubmit="closeModal()">
-    <input type="file" name="file" id="file" required/>
-    <input type="submit" value="Upload" class="bg-gray-500 hover:bg-gray-700 cursor-pointer text-white font-bold py-2 px-4 rounded"/>
-  </form>
+  <div id="file-modal">
+    <span class="text-center mb-4 font-bold ">Upload file</span>
+    <div id="tabs" class="md:flex flex-row mx-auto gap-12 border-b mb-4">
+      <button hx-get="/fileTab" hx-target="#file-modal" class="hover:bg-gray-300 rounded-md p-2">Upload file</button>
+      <button hx-get="/folderTab" hx-target="#file-modal" class="hover:bg-gray-300 rounded-md">New folder</button>
+    </div>
+    <form id="uploadForm" hx-post="/upload" hx-encoding="multipart/form-data" hx-target="#content"
+      class="flex flex-col gap-2 mt-2" onsubmit="closeModal()" hx-vals='{"folderId": "<%= folderId %>"}'>
+      <input type="file" name="file" id="file" required class="mb-4" />
+      <input type="submit" value="Upload"
+        class="bg-gray-500 hover:bg-gray-700 cursor-pointer text-white font-bold py-2 px-4 rounded" />
+    </form>
+  </div>
 </div>
