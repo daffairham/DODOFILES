@@ -24,7 +24,6 @@ const saveFileToDatabase = (
         console.error("Error:", error);
         callback(error, null);
       } else {
-        console.log("File berhasil disimpan ke database");
         callback(null, result);
       }
     }
@@ -119,11 +118,6 @@ const createFolder = (filename, uploadDate, parent, fileOwner, callback) => {
   const query = `INSERT INTO filesystem_entity(file_name, upload_date, size, parent, deleted_date, file_owner, is_folder, unique_filename)
                     VALUES ($1, $2, 0, $3, NULL, $4, TRUE, NULL)`;
 
-  const values = [filename, uploadDate, parent, fileOwner];
-
-  console.log("Running query:", query);
-  console.log("With values:", values);
-
   db.query(
     query,
     [filename, uploadDate, parent, fileOwner],
@@ -204,6 +198,30 @@ const moveFile = (userId, filename, parent, callback) => {
       callback(err, null);
     } else {
       console.log("File moved successfully");
+      callback(null, result);
+    }
+  });
+};
+
+const copyFile = (fileName, uploadDate, fileSize, parentID, fileOwner, isFolder, uniqueName, entityLink, sourceFilename, callback) => {
+  const query = `INSERT INTO filesystem_entity(file_name, upload_date, size, parent, deleted_date, file_owner, is_folder, unique_filename, entity_link)
+                  VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, $8)`;
+  db.query(query, [fileName, uploadDate, fileSize, parentID || null, fileOwner, isFolder, uniqueName, entityLink ], (err, result) => {
+    if (err) {
+      console.error("Error:", err);
+      callback(err, null);
+    } else {
+      if(!isFolder){
+        const sourceFile = path.join(__dirname, "..", "files", sourceFilename);
+        const destFile = path.join(__dirname, "..", "files", uniqueName);
+        fs.copyFile(sourceFile, destFile, (err)=>{
+          if(err){
+            throw err;
+          }
+          console.log(uniqueName);
+        })
+      }
+      
       callback(null, result);
     }
   });
@@ -320,4 +338,5 @@ module.exports = {
   getEntityIdByName,
   renameEntity,
   getEntityDetailsByLink,
+  copyFile,
 };

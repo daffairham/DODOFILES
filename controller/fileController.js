@@ -5,6 +5,7 @@ const path = require("path");
 const files = require("../model/files.js");
 const jwt = require("../config/jwt.js");
 const bytes = require("bytes")
+const { v4: uuidv4 } = require("uuid");
 
 router.post("/upload", jwt.authenticate, (req, res) => {
   const file = req.files.file;
@@ -16,23 +17,49 @@ router.post("/upload", jwt.authenticate, (req, res) => {
     if (err) {
       throw err;
     } else {
-      files.getFilesInFolder(userId, parent, (err, fileList) => {
-        if (err) {
-          throw err;
-        } else {
-          files.getUserFolder(userId, (err, folderList) => {
-            if (err) {
-              throw err;
-            }
-            res.render("parts/fileList", {
-              fileList,
-              userData,
-              folderName: "",
-              folderList,
+      if(parent == null){
+        files.getFilesInRoot(userId, (err, fileList) => {
+          if (err) {
+            throw err;
+          } else {
+            files.getUserFolder(userId, (err, folderList) => {
+              if (err) {
+                throw err;
+              }
+              res.render("parts/fileList", {
+                fileList,
+                userData,
+                folderName: "",
+                folderList,
+              });
             });
-          });
-        }
-      });
+          }
+        });
+      } else{
+        files.getFilesInFolder(userId, parent, (err, fileList) => {
+          if (err) {
+            throw err;
+          } else {
+            files.getUserFolder(userId, (err, folderList) => {
+              if (err) {
+                throw err;
+              }
+              files.getFolderName(userId, parent, (err, folderName)=>{
+                if(err){
+                  throw err;
+                }
+                res.render("parts/fileList", {
+                  fileList,
+                  userData,
+                  folderName: folderName.rows[0].file_name,
+                  folderList,
+                });
+              })
+            });
+          }
+        });
+      }
+      
     }
   });
 });
@@ -79,7 +106,6 @@ router.get("/folder/:folderId", jwt.authenticate, (req, res) => {
   const userData = req.user;
   const userId = req.user.user_id;
   let folderName = "";
-
   files.getFilesInFolder(userId, folderId, (err, fileList) => {
     if (err) {
       console.error(err);
@@ -130,6 +156,39 @@ router.post("/moveFile", jwt.authenticate, (req, res) => {
   const parent = req.body.foldernames === "null" ? null : req.body.foldernames;
 
   files.moveFile(userId, filename, parent, (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Server Error");
+    } else {
+      files.getEntityIdByName(userId, filename, (err, result) => {
+        if (err) {
+          console.error(err);
+          res.status(500).send("Server Error");
+        } else {
+          let parentDestination = result;
+
+          if (Number(parent) === parentDestination) {
+            return res.status(200).send();
+          } else {
+            console.log("File moved successfully.", parent, parentDestination);
+            res.status(200).send();
+          }
+        }
+      });
+    }
+  });
+});
+
+router.post("/copyFile", jwt.authenticate, (req, res) => {
+  const userId = req.user.user_id;
+  const filename = req.body.filename;
+  const parent = req.body.foldernames === "null" ? null : req.body.foldernames;
+  const uniqueName = uuidv4();
+  const entityLink = uuidv4();
+  const fileSize = req.body.fileSize;
+  const isFolder = req.body.isFolder;
+  const sourceFilename = req.body.sourceFilename;
+  files.copyFile(filename, new Date(), fileSize, parent, userId, isFolder, uniqueName, entityLink, sourceFilename, (err) => {
     if (err) {
       console.error(err);
       res.status(500).send("Server Error");

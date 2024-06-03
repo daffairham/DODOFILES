@@ -1,5 +1,4 @@
 const express = require("express");
-const controller = require("./controller/routes")
 const bodyParser = require('body-parser');
 const upload = require("express-fileupload")
 const cookieParser = require("cookie-parser");

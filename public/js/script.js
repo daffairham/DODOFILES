@@ -22,6 +22,14 @@ function closeMoveFileModal(index) {
   document.getElementById(`move-file-modal${index}`).classList.add("hidden");
 }
 
+function openCopyFileModal(index) {
+  document.getElementById(`copy-file-modal${index}`).classList.remove("hidden");
+}
+
+function closeCopyFileModal(index) {
+  document.getElementById(`copy-file-modal${index}`).classList.add("hidden");
+}
+
 function openShareFileModal(index) {
   document.getElementById(`share-file-modal${index}`).classList.remove("hidden");
 }

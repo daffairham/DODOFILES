@@ -17,14 +17,13 @@
             <i class="fa fa-file text-l" aria-hidden="true"></i>
           </a>
           <% } else { %>
-            <a href="/folder/<%= file.file_id %>" hx-boost="true" class="folder-link">
+            <a href="folder/<%= file.file_id %>" hx-boost="true" class="folder-link">
               <i class="fa fa-folder text-l" aria-hidden="true"></i>
             </a>
             <% } %>
       </div>
       <div class="flex-grow truncate w-full text-sm font-semibold">
         <%= file.file_name %>
-
       </div>
       <div class="flex-shrink-0 relative">
         <button class="option-btn flex items-center justify-center hover:bg-gray-500 rounded-md w-8 h-8"
@@ -37,9 +36,15 @@
                 href="download?filename=<%= file.file_name %>" class="file-link">
                 Download
               </a></button>
+              <% } else { %>
             <% } %>
+            <% if (file.permission  === 'rw') { %>
               <button onclick="openRenameModal(<%= index %>)" class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                hx-trigger="">Rename</button>
+                hx-trigger="">Rename </button>
+            <% } else { %>
+              <button disabled class="block px-4 py-2 text-sm text-gray-300"
+                hx-trigger="">Rename </button>
+              <% }  %>
               <button disabled
                 class="block px-4 py-2 text-sm text-gray-300">Move file</button>
               <button hx-post="/removeSharedFile?filename=<%= file.file_name %>" hx-target=".file-item<%= index %>"
