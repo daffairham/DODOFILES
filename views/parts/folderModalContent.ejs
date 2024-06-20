@@ -3,14 +3,14 @@
     <button hx-get="/fileTab" hx-target="#upload-modal" class="hover:bg-gray-300 rounded-md p-2">Upload file</button>
     <button hx-get="/folderTab" hx-target="#file-modal" class="hover:bg-gray-300 rounded-md">New folder</button>
 </div>
-<form id="uploadForm" hx-post="/createFolder" hx-encoding="multipart/form-data" hx-target="#content"
-    class="flex flex-col gap-2 mt-2" onsubmit="closeModal()">
+<form id="uploadForm" hx-post="/createFolder" hx-encoding="multipart/form-data"
+    class="flex flex-col gap-2 mt-2" onsubmit="closeModal()" hx-target=".main" hx-swap="outerHTML">
     <label for="folder-name">Folder name:</label>
     <input type="text" name="folder-name" id="folder-name" class="border-gray-400 border-2 p-2 rounded-md">
-    <label for="folderparent" class="mb-2">Select one of your folders to be a parent of your new folder: </label>
+    <label for="folderparent" class="mb-2">Where do you want this folder to be created? </label>
     <select name="folderparent" id="folderparent" class="mb-8 border-2 rounded-md p-2 border-gray-500" required>
         <option value="" selected disabled hidden>Choose a folder...</option>
-        <option value="null">Root</option>
+        <option value="null">Main directory</option>
         <% for( const row of folderList ) { %>
             <option value="<%= row.file_id %>">
                 <%= row.file_name %>

@@ -9,7 +9,7 @@
         <label for="foldernames" class="mb-4">Select a folder to move your file: </label>
         <select name="foldernames" id="foldernames" class="mb-8 border-2 rounded-md p-2 border-gray-500">
           <option value="" selected disabled hidden>Choose a folder...</option>
-          <option value="null">Root</option>
+          <option value="null">Main directory</option>
             <% for( const row of folderList ) { %>
               <option value="<%= row.file_id %>"><%= row.file_name %></option>
             <% } %>

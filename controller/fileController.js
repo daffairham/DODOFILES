@@ -222,37 +222,76 @@ router.post("/createFolder", jwt.authenticate, (req, res) => {
     if (err) {
       return res.status(500).send("Error creating folder.");
     }
+    if(parent !== null){
+      res.redirect(`/folder/${parent}`)
+    }
+    else{
+      res.redirect(`/`)
+    }
     res.send();
   });
 });
 
-router.post("/rename", (req, res)=>{
+router.post("/rename", jwt.authenticate, (req, res)=>{
   const userData = req.user;
   const userId = jwt.getIdFromToken(req.cookies.token);
   const file_id = req.body.fileid;
   const newEntityName = req.body.newName;
-  files.renameEntity(file_id, newEntityName, (err)=>{
-    if(err){
-      console.error(err);
-    }
-    files.getFilesInRoot(userId, (err, fileList)=>{
-      if(err){
-        console.log(err);
-      }
-      else{
-        files.getUserFolder(userId, (err, folderList)=>{
-          if(err){
-            throw err
+  const parent = req.body.currentFolder || null; 
+  files.renameEntity(file_id, newEntityName, (err, result) => {
+    if (err) {
+      throw err;
+    } else {
+      if(parent == null){
+        files.getFilesInRoot(userId, (err, fileList) => {
+          if (err) {
+            throw err;
+          } else {
+            files.getUserFolder(userId, (err, folderList) => {
+              if (err) {
+                throw err;
+              }
+              res.render("parts/fileList", {
+                fileList,
+                userData,
+                folderName: "",
+                folderList,
+                folderId : parent || null,
+              });
+            });
           }
-          res.render('parts/fileList', {fileList, userData, folderName: "", folderList});
-        })
-        
+        });
+      } else{
+        files.getFilesInFolder(userId, parent, (err, fileList) => {
+          if (err) {
+            throw err;
+          } else {
+            files.getUserFolder(userId, (err, folderList) => {
+              if (err) {
+                throw err;
+              }
+              files.getFolderName(userId, parent, (err, folderName)=>{
+                if(err){
+                  throw err;
+                }
+                res.render("parts/fileList", {
+                  fileList,
+                  userData,
+                  folderName: folderName.rows[0].file_name,
+                  folderList,
+                  folderId : parent || null,
+                });
+              })
+            });
+          }
+        });
       }
-    });
-  })
+      
+    }
+  });
 });
 
-router.get("/f/:link", (req, res)=>{
+router.get("/f/:link", jwt.authenticate, (req, res)=>{
   const link = req.params.link;
   files.getEntityDetailsByLink(link, (err, results)=>{
     if(err){

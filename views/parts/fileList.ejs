@@ -20,9 +20,7 @@
 
               <div class="flex-grow-0 mr-4">
                 <% if (!file.is_folder) { %>
-                  <a href="download?filename=<%= file.file_name %>" class="file-link">
                     <i class="fa fa-file text-l" aria-hidden="true"></i>
-                  </a>
                   <% } else { %>
                     <a href="/folder/<%= file.file_id %>" hx-boost="true" class="folder-link">
                       <i class="fa fa-folder text-l" aria-hidden="true"></i>
@@ -42,21 +40,21 @@
                   id="dropdown<%= index %>">
                   <% if (!file.is_folder) { %>
                     <button class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"><a
-                        href="download?filename=<%= file.file_name %>" class="file-link">
+                        href="/download?filename=<%= file.file_name %>" class="file-link">
                         Download
                       </a></button>
-                    <% } %>
-                      <button onclick="openRenameModal(<%= index %>)"
-                        class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" hx-trigger="">Rename</button>
-                      <button onclick="openMoveFileModal(<%= index %>)"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Move file</button>
-                      <button onclick="openCopyFileModal(<%= index %>)"
+                      <button onclick="event.stopPropagation(); openCopyFileModal(<%= index %>)"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Copy file</button>
-                      <button hx-post="/delete?filename=<%= file.file_name %>" hx-target=".file-item<%= index %>"
+                    <% } %>
+                      <button onclick="event.stopPropagation(); openRenameModal(<%= index %>)"
+                        class="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" hx-trigger="">Rename</button>
+                      <button onclick="event.stopPropagation(); openMoveFileModal(<%= index %>)"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Move file</button>
+                      <button onclick="event.stopPropagation();" hx-post="/delete?filename=<%= file.file_name %>" hx-target=".file-item<%= index %>"
                         hx-swap="outerHTML swap:0.5s"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 val">Move
                         to recycle bin</button>
-                      <button onclick="openShareFileModal(<%= index %>)"
+                      <button onclick="event.stopPropagation(); openShareFileModal(<%= index %>)"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Share</button>
                 </div>
               </div>
