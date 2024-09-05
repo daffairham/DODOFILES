@@ -1,60 +1,43 @@
-<div class="md:flex flex-row gap-20 items-center">
-  <h1 class="mt-2 ml-6 font-semibold text-xl">Recycle Bin</h1>
-</div>
-<div id="fileList" class="mt-6 ml-6 md:grid grid-cols-8 gap-4">
-  <% fileList.forEach((file, index)=> { %>
-    <div class="items file-item<%= index %> bg-white p-4 rounded-md shadow-lg hover:bg-gray-200 flex items-center relative">
-      <div class="flex-grow-0 mr-4">
-        <% if (!file.is_folder) { %>
-            <i class="fa fa-file text-l" aria-hidden="true"></i>
-          <% } else { %>
-            <a href="folder?foldername=<%= file.file_name %>" hx-target="#content" hx-boost="true" class="folder-link">
-              <i class="fa fa-folder text-l" aria-hidden="true"></i>
-            </a>
-            <% } %>
-      </div>
-      <div class="flex-grow truncate text-l font-semibold">
-        <% if (!file.is_folder) { %>
-          <span class="file-link">
+<div>
+  <h1 class="mt-12 mb-4 ml-6 font-semibold text-base text-[#7f848d]">
+    Recycle Bin
+  </h1>
+  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ml-4">
+    <% fileList.forEach((file, index)=> { %>
+      <% if (file.is_folder) { %>
+        <div hx-get="/folder/<%= file.file_id %>" hx-trigger="click" hx-boost="true" hx-target=".main"
+          hx-swap="outerHTML"
+          class="file-item<%= index %> relative border-[1.5px] border-[#7f848d] p-4 rounded-md flex items-center space-x-4 hover:bg-gray-300 cursor-pointer">
+          <img src="img/Folder.png" alt="Folder Icon" class="w-6 h-6">
+          <p class="text-sm font-medium text-gray-700 flex-1 truncate pr-10">
             <%= file.file_name %>
-          </span>
-          <input type="hidden" name="filename" id="filename" value="<%= file.file_name %>">
+          </p>
+          <button class="absolute right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+            onclick="event.stopPropagation(); toggleDropdown(this, <%= index %>)">
+            <img src="img/ellipsis_dark.png" alt="">
+          </button>
           <% } else { %>
-            <span class="folder-link">
-              <%= file.file_name %>
-            </span>
-            <input type="hidden" name="filename" id="filename" value="<%= file.file_name %>">
-            <% } %>
-      </div>
-      <div class="flex-shrink-0 relative">
-        <button class="option-btn flex items-center justify-center hover:bg-gray-500 rounded-md w-8 h-8"
-          onclick="toggleDropdown(this, <%= index %>)">
-          <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
-        </button>
-        <div class="dropdown hidden absolute mt-2 w-48 z-10 bg-white rounded-md shadow-lg" id="dropdown<%= index %>">
-          <button hx-post="/restore?filename=<%= file.file_name %>" hx-post="/delete?filename=<%= file.file_name %>"
-            hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s"
-            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 val">Restore</button>
-          <button hx-get="/deleteFromSystem?filename=<%= file.file_name %>"
-            class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 val">Delete forever</button>
+            <div
+              class="file-item<%= index %> relative border-[1.5px] border-[#7f848d] p-4 rounded-md flex items-center space-x-4 hover:bg-gray-300 cursor-pointer">
+              <img src="img/File.png" alt="File Icon" class="w-6 h-6">
+              <p class="text-sm font-medium text-gray-700 flex-1 truncate pr-10">
+                <%= file.file_name %>
+              </p>
+              <button
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                onclick="event.stopPropagation(); toggleDropdown(this, <%= index %>)">
+                <img src="img/ellipsis_dark.png" alt="">
+              </button>
+              <% } %>
+              <div class="dropdown hidden absolute mt-2 w-48 z-10 bg-white rounded-md shadow-lg" id="dropdown<%= index %>">
+                <button hx-post="/restore?filename=<%= file.file_name %>" hx-post="/delete?filename=<%= file.file_name %>"
+                  hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF] val">Restore</button>
+                <button hx-get="/deleteFromSystem?filename=<%= file.file_name %>"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF] val">Delete forever</button>
+              </div>
+            </div>
+                    <% }) %>
         </div>
-      </div>
-    </div>
-
-    <div id="rename-modal<%= index %>"
-      class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
-      <div class="modal-content bg-white rounded-lg p-8 md:flex flex-col w-1/4">
-        <span class="text-center mb-4">Rename <%= file.file_name %></span>
-        <form id="uploadForm" hx-post="/rename" hx-target="#content" class="flex flex-col gap-2"
-          onsubmit="closeRenameModal()">
-          <input type="hidden" id="oldName" name="oldName" value="<%= file.name %>">
-          <input type="text" value="<%= file.name %>" name="newName" id="newName"
-            class="p-2 border-black bg-gray-100 rounded-sm">
-          <input type="submit" value="Rename"
-            class="bg-gray-500 hover:bg-gray-700 cursor-pointer text-white font-bold py-2 px-4 rounded" />
-        </form>
-      </div>
-    </div>
-
-    <% }) %>
+  </div>
 </div>

@@ -1,39 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/output.css" />
-    <title>Create Your Account | DODOFILES</title>
-  </head>
-  <body class="bg-white">
-    <div class="container md:mx-auto md:flex flex-col mt-8 md:mt-44 justify-center items-center">
-      <h1 class="text-black text-center mb-4 font-bold">DODOFILES</h1>
-      <div class="bg-gray-300 px-4 py-8 md:px-8 md:py-12 rounded-md shadow-xl w-full md:w-1/2 mx-auto items-center justify-center">
-        <h1 class="text-black text-center font-bold">Create Your Account</h1>
-        <form class="md:flex flex-col" action="/register" method="post">
-          <div class="md:flex flex-col mb-4">
-            <label class="mb-1 font-medium" for="username" id="username">EMAIL</label>
-            <input class="rounded-xl p-2" type="email" id="email" name="email" required />
-          </div>
-          <div class="md:flex flex-col mb-4">
-            <label class="mb-1 font-medium" for="username" id="username">USERNAME</label>
-            <input class="rounded-xl p-2" type="text" id="username" name="username" required />
-          </div>
-          <div class="md:flex flex-col mb-4">
-            <label class="mb-1 font-medium" for="password" id="password">PASSWORD</label>
-            <input class="rounded-xl p-2" type="password" id="password" name="password" required />
-          </div>
-          <div class="mx-auto text-center">
-            <button class="bg-cyan-400 font-semibold text-center rounded-md w-full md:w-[8em] h-[2.5em] mb-4 shadow-sm hover:bg-cyan-500 text-white" type="submit">
-              LOGIN
-            </button>
-          </div>
-          <div class="text-center">
-            <span>Already have an account? <br> <a class="text-blue-500 hover:text-blue-700" href="/login">Sign in here</a></span>
-          </div>
-        </form>
-      </div>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Register</title>
+    <link rel="stylesheet" href="css/output.css">
+</head>
+
+<body class="bg-gradient-to-b from-[#0CC0DF] to-[#2563EB] h-screen font-sans">
+    <div class="relative h-full w-full flex items-center justify-center">
+        <div id="dodofiles" class="absolute top-0 left-0 m-8 text-2xl font-bold text-white">
+            <p class="text-5xl">DODO</p>
+            <p class="text-5xl">FILES</p>
+        </div>
+
+        <div id="signin" class="flex flex-col items-center justify-center">
+            <div class="text-white text-4xl font-extrabold mb-4">
+                <h2>Register</h2>
+            </div>
+            <div id="register-form" class="bg-white rounded-lg p-8 shadow-lg w-[42rem]">
+                <form action="/register" method="post" class="flex flex-col space-y-4">
+                    <div class="flex flex-col items-start">
+                        <label for="email" class="text-[#7f848d] mb-1">Email</label>
+                        <input type="email" id="email" name="email" class="w-full p-2 border rounded-3xl bg-[#D9D9D9]" required/>
+                    </div>
+                    <div class="flex flex-col items-start">
+                        <label for="username" class="text-[#7f848d] mb-1">Username</label>
+                        <input type="text" id="username" name="username" class="w-full p-2 border rounded-3xl bg-[#D9D9D9]" required/>
+                    </div>
+                    <div class="flex flex-col items-start">
+                        <label for="password" class="text-[#7f848d] mb-1">Password</label>
+                        <input type="password" id="password" name="password" class="w-full p-2 border rounded-3xl bg-[#D9D9D9]" required/>
+                    </div>
+                    <div class="flex justify-center">
+                        <button type="submit" class="w-1/4 bg-[#2563EB] text-white px-8 py-4 rounded-2xl hover:bg-blue-500">
+                            Register
+                        </button>
+                    </div>
+                    <div class="text-center">
+                        <span class="text-[#7f848d]">Already have an account?  <a class="text-[#2563EB] font-medium" href="/sign-in">Sign In instead</a>.</span>
+                      </div>
+                </form>
+            </div>
+        </div>
+
     </div>
-  </body>
+</body>
+
 </html>

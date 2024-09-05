@@ -9,45 +9,36 @@ router.get("/", jwt.authenticate, (req, res) => {
   res.render("login");
 });
 
-router.get("/login", (req, res) => {
+router.get("/sign-in", (req, res) => {
   res.redirect("/");
 });
 
-router.post("/login", (req, res) => {
+router.post("/sign-in", async (req, res) => {
   const { username, password } = req.body;
-  
-  users.getUser(username, (error, userData) => {
-    if (error) {
-      console.error("Error:", error);
-      res.status(500).send("Server Error");
-    } else {
-      if (userData) {
-        const userPassword = userData.password;
-        bcrypt.compare(password, userPassword, (err, result) => {
-          if (err) {
-            console.error("Error:", err);
-            res.status(500).send("Server Error");
-          } else {
-            if (result) {
-              const token = jwt.generateToken(userData);
-              req.user = userData;
-              res.cookie("token", token, {
-                httpOnly: true,
-                secure: true,
-              });
-              res.redirect("/home");
-            } else {
-              console.log("Invalid password");
-              res.redirect("/");
-            }
-          }
+  try {
+    const userData = await users.getUser(username);
+    if (userData) {
+      const userPassword = userData.password;
+      const isMatch = await bcrypt.compare(password, userPassword);
+      if (isMatch) {
+        const token = jwt.generateToken(userData);
+        res.cookie("token", token, {
+          httpOnly: true,
+          secure: true,
         });
+        res.redirect("/home");
       } else {
-        console.log("Account not registered");
+        console.log("Invalid password");
         res.redirect("/");
       }
+    } else {
+      console.log("Account not registered");
+      res.redirect("/");
     }
-  });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Server Error");
+  }
 });
 
 router.get("/logout", (req, res) => {

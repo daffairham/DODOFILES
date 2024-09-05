@@ -27,7 +27,7 @@ function openCopyFileModal(index) {
 }
 
 function closeCopyFileModal(index) {
-  document.getElementById(`copy-file-modal${index}`).classList.add("hidden");
+  document.getElementById(`copy-file-modal${index}`).classList.add('hidden');
 }
 
 function openShareFileModal(index) {
@@ -51,34 +51,23 @@ function toggleDropdown(button, index) {
 }
 
 window.onclick = function (event) {
-  var uploadModal = document.getElementById("upload-modal");
-  
-  for (let i = 0; i < fileList.length; i++) {
-    var renameModal = document.getElementById(`rename-modal${i}`);
-    if (event.target == renameModal) {
-      closeRenameModal(i);
+  const allDropdowns = document.querySelectorAll('.dropdown');
+  allDropdowns.forEach(dropdown => {
+    if (!dropdown.contains(event.target) && !event.target.closest('button')) {
+      dropdown.classList.add('hidden');
     }
-  }
+  });
 
-  if (event.target == uploadModal) {
+  if (event.target == document.getElementById("upload-modal")) {
     closeModal();
   }
 };
 
-//tutup modal kalau klik elemen selain
 window.addEventListener('click', function(event) {
-
-  for (let i = 0; i < fileList.length; i++) {
-    const renameModal = document.getElementById(`rename-modal${i}`);
-    if (event.target !== renameModal && !renameModal.contains(event.target)) {
-      closeRenameModal(i);
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modal => {
+    if (event.target == modal) {
+      modal.classList.add('hidden');
     }
-  }
-
-  if (!event.target.classList.contains('option-btn') && !event.target.closest('.dropdown')) {
-    const allDropdowns = document.querySelectorAll('.dropdown');
-    allDropdowns.forEach(dropdown => {
-      dropdown.classList.add('hidden');
-    });
-  }
+  });
 });

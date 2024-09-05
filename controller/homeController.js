@@ -3,57 +3,56 @@ const router = express.Router();
 const files = require("../model/files.js");
 const jwt = require("../config/jwt.js");
 
-router.get("/home", jwt.authenticate, (req, res)=>{
+router.get("/home", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = jwt.getIdFromToken(req.cookies.token);
-  files.getFilesInRoot(userId, (err, fileList)=>{
-    if(err){
-      console.log(err);
-    }
-    else{
-      files.getUserFolder(userId, (err, folderList)=>{
-        if(err){
-          throw err
-        }
-        console.log("params:", req.params);
-        res.render('index', {fileList, userData, folderName: "", folderList, folderId: null});
-      })
-      
-    }
-  });
+
+  try {
+    const fileList = await files.getFilesInRoot(userId);
+    const folderList = await files.getUserFolder(userId);
+    let entityAmt = fileList.length + folderList.length; //Jumlah entity
+    res.render('index', { fileList, userData, folderName: "", folderList, folderId: null, entityAmt });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
 });
 
-router.get("/bin", jwt.authenticate, (req, res)=>{
+router.get("/recycle-bin", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = userData.user_id;
-  files.getDeletedFiles(userId, (err, fileList)=>{
-    if(err){
-      console.log(err);
-    }
-    else{
-      res.render('bin', {fileList, userData, folderId: null});
-    }
-  });
+
+  try {
+    const fileList = await files.getDeletedFiles(userId);
+    res.render('bin', { fileList, userData, folderId: null });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
 });
 
-router.get("/folderTab", jwt.authenticate, (req, res)=>{
+router.get("/folderTab", jwt.authenticate, async (req, res) => {
   const userId = jwt.getIdFromToken(req.cookies.token);
-  files.getUserFolder(userId, (err, folderList)=>{
-    if(err){
-      throw err
-    }
-    res.render("parts/folderModalContent", {folderList});
-  })
+
+  try {
+    const folderList = await files.getUserFolder(userId);
+    res.render("parts/folderModalContent", { folderList });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
 });
 
-router.get("/fileTab", jwt.authenticate, (req, res)=>{
+router.get("/fileTab", jwt.authenticate, async (req, res) => {
   const userId = jwt.getIdFromToken(req.cookies.token);
-  files.getUserFolder(userId, (err, folderList)=>{
-    if(err){
-      throw err
-    }
-    res.render("parts/uploadModal", {folderList});
-  })
+
+  try {
+    const folderList = await files.getUserFolder(userId);
+    res.render("parts/uploadModal", { folderList });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
 });
 
 module.exports = router;

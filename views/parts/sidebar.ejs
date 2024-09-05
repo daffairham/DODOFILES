@@ -1,16 +1,25 @@
 <div id="sidebar"
-  class="md:flex flex-col align-baseline fixed -left-1 top-0 z-50 h-full w-52 rounded-md bg-white p-4 shadow-sm">
-  <a href="/home">
-    <span class="ml-3 text-lg font-semibold text-black">DODOFILES</span>
+  class="md:flex flex-col align-baseline fixed -left-1 top-0 z-50 h-full w-56 rounded-md bg-white p-4 shadow-sm">
+  <a href="/">
+    <img src="img/Logo.png" alt="Logo" class="w-24 mb-4">
   </a>
   <button onclick="openModal()"
-    class="bg-gray-500 rounded-full p-4 mx-auto text-white text-m font-semibold hover:bg-gray-700 mt-4">New</button>
+  class="bg-[#0CC0DF] rounded-lg px-4 py-2 mx-auto text-white text-s font-semibold hover:bg-[#30aac0] mt-4">Add Files</button>
   <div id="sidebar-items" class="md:flex flex-col justify-start mt-4">
-    <a href="/home" hx-boost="true" class="ml-2 text-left p-2 w-3/4 hover:bg-gray-200 hover:rounded-md"><i
-        class="fa fa-home" aria-hidden="true"></i> Home</a>
-    <a href="/bin" hx-boost="true" class="ml-2 text-left p-2 w-3/4 hover:bg-gray-200 hover:rounded-md"
-      ><i class="fa fa-trash" aria-hidden="true"></i> Recycle Bin</a>
-    <a href="/shared-files" hx-boost="true" class="ml-2 text-left p-2 w-3/4 hover:bg-gray-200 hover:rounded-md"><i
-        class="fa fa-users" aria-hidden="true"></i> Shared Files</a>
+    <a href="/" hx-boost="true"
+      class="flex items-center ml-2 text-left p-2 w-3/4 hover:bg-[#0cbfdf49] hover:rounded-md">
+      <img src="img/Folder_file_fill.png" alt="Home Icon" class="w-5 h-5 mr-2">
+      My Files
+    </a>
+    <a href="/shared-files" hx-boost="true"
+      class="flex items-center ml-2 text-left p-2 w-3/4 hover:bg-[#0cbfdf49] hover:rounded-md">
+      <img src="img/sharedfiles.png" alt="Shared Files Icon" class="w-5 h-5 mr-2">
+      Shared Files
+    </a>
+    <a href="/recycle-bin" hx-boost="true"
+      class="flex items-center ml-2 text-left p-2 w-3/4 hover:bg-[#0cbfdf49] hover:rounded-md">
+      <img src="img/trashcanfill.png" alt="Recycle Bin Icon" class="w-5 h-5 mr-2">
+      Recycle Bin
+    </a>
   </div>
 </div>
