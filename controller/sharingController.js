@@ -5,54 +5,65 @@ const path = require("path");
 const sharing = require("../model/sharingModel.js");
 const jwt = require("../config/jwt.js");
 
-router.post("/share", jwt.authenticate, (req, res) => {
-  let userId = "";
+router.post("/share", jwt.authenticate, async (req, res) => {
   const targetEmail = req.body.email;
   const entityId = req.body.entityid;
-  let permission = req.body.permission;
+  let permission = req.body.permission === "1" ? "r" : "rw";
 
-  if (permission == 1) {
-    permission = "r";
-  } else {
-    permission = "rw";
-  }
-
-  sharing.getUserIdToShare(targetEmail, (err, res) => {
-    if (err) {
-      throw err;
+  try {
+    const userId = await sharing.getUserIdToShare(targetEmail);
+    
+    const permissionExist = await sharing.checkPermissionExist(userId, entityId);
+    
+    if (permissionExist.rows > 0) {
+      res.send("User already has access to this file/folder");
+      return;
     }
-    userId = res;
-    sharing.checkPermissionExist(userId, entityId, (err, results) => {
-      if (results.rows > 0) {
-        res.send("User already has access to this file/folder");
-        return
-      } else {
-        sharing.grantPermission(userId, entityId, permission, (err) => {
-          if (err) {
-            throw err;
-          }
-          console.log("File shared.");
-        });
-      }
-    });
-  });
-  res.redirect(req.originalUrl);
+
+    await sharing.grantPermission(userId, entityId, permission);
+    console.log("File shared.");
+    
+    res.redirect(req.originalUrl);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while sharing the file/folder.");
+  }
 });
 
-router.get("/shared-files", jwt.authenticate, (req, res) => {
+router.get("/shared-files", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = jwt.getIdFromToken(req.cookies.token);
-  sharing.getSharedFiles(userId, (err, fileList) => {
-    if (err) {
-      console.log(err);
-    }
+
+  try {
+    const fileList = await sharing.getSharedFiles(userId);
     res.render("sharedFiles", {
       fileList,
       userData,
       folderName: "",
       folderId: null,
+      entityAmt: fileList.length
     });
-  });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while retrieving shared files.");
+  }
 });
+
+
+router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
+  const userData = req.user;
+  const userId = jwt.getIdFromToken(req.cookies.token);
+  const entityName = req.query.filename;
+  try {
+    sharing.removeSharedAccess(userId, entityName);
+    res.status(200).send();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("An error occurred while retrieving shared files.");
+  }
+});
+
+
+
 
 module.exports = router;

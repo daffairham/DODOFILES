@@ -1,5 +1,6 @@
 <div id="share-file-modal<%= index %>"
   class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
+  
   <div class="modal-content bg-white rounded-lg p-8 md:flex flex-col w-1/4">
     <div class="flex justify-between items-center mb-4">
       <span class="text-center text-[#0CC0DF]">Share <span class="font-semibold">"<%= file.file_name %>"</span></span>
@@ -10,22 +11,8 @@
       <input type="email" name="email" id="email" placeholder="Input the person's email to share.."
         class="border-[#0CC0DF] border-2 p-2 rounded-md text-center" required>
       <label for="permission" class="mt-4 text-base text-[#A2A6AD]">People who have access to this file:</label>
-      <div>
-        <div id="shared-users" class="flex flex-col mt-2">
-          <div class="flex items-center justify-between p-2 border-b border-gray-300">
-            <div class="md:flex flex-col">
-              <span>Username</span>
-              <span class="text-[#A2A6AD]">user@example.com</span>
-            </div>
-            <div class="relative">
-              <select
-                class="hover:border-[#0CC0DF] hover:cursor-pointer hover:bg-slate-300 border-2 p-1 rounded-md text-gray-700">
-                <option value="view">View</option>
-                <option value="edit">Edit</option>
-              </select>
-            </div>
-          </div>
-        </div>
+      
+      <div id="shared-users<%= index %>" class="flex flex-col mt-2">
       </div>
 
       <div class="md:flex items-center justify-center mt-4">
@@ -35,9 +22,3 @@
     </form>
   </div>
 </div>
-
-
-<!-- <select class="border-gray-500 border-2 p-2 rounded-md" name="permission" id="permission">
-    <option value="1">Can only view</option>
-    <option value="2">Can edit</option>
-  </select> -->

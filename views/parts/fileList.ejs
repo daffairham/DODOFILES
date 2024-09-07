@@ -1,58 +1,65 @@
 <div>
   <h1 class="mt-12 mb-4 ml-6 font-semibold text-base text-[#7f848d]">
-    <%= folderName === "" ? "Files" : folderName %>
+    <%= folderName==="" ? "Files" : folderName %>
   </h1>
-  
-  <% if (entityAmt === 0) { %>
+
+  <% if (entityAmt===0) { %>
     <div class="md:flex md:flex-col items-center justify-center">
       <img src="img/ppl2.png" class="mt-28 w-1/3 mb-4" alt="">
       <span class="text-2xl text-[#7f848d]">There's nothing here..</span>
       <span class="text-sm text-[#7f848d]">Try uploading a file or a folder, perhaps?</span>
     </div>
-  <% } else { %>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ml-4">
-      <% fileList.forEach((file, index) => { %>
-        <div class="file-item<%= index %> relative border-[1.5px] border-[#7f848d] p-4 rounded-md flex items-center space-x-4 hover:bg-gray-300 cursor-pointer">
-          <% if (file.is_folder) { %>
-            <img src="img/Folder.png" alt="Folder Icon" class="w-6 h-6">
-          <% } else { %>
-            <img src="img/File.png" alt="File Icon" class="w-6 h-6">
-          <% } %>
-          <p class="text-sm font-medium text-gray-700 flex-1 truncate pr-10">
-            <%= file.file_name %>
-          </p>
-          <button
-            class="absolute right-2 text-gray-500 hover:text-gray-700 hover:bg-[#0cbfdfa8] hover:rounded-full focus:outline-none"
-            onclick="event.stopPropagation(); toggleDropdown(this, <%= index %>)">
-            <img src="img/ellipsis_dark.png" alt="">
-          </button>
-          <div class="dropdown hidden absolute right-0 top-10 mt-2 w-48 z-10 bg-white rounded-md shadow-lg"
-            id="dropdown<%= index %>">
-            <% if (!file.is_folder) { %>
-              <button class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">
-                <a href="/download?filename=<%= file.file_name %>" class="file-link">Download</a>
-              </button>
-              <button onclick="event.stopPropagation(); openCopyFileModal(<%= index %>)"
-                class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Copy file
-              </button>
-            <% } %>
-            <button onclick="event.stopPropagation(); openRenameModal(<%= index %>)"
-              class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Rename
-            </button>
-            <button onclick="event.stopPropagation(); openMoveFileModal(<%= index %>)"
-              class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move file
-            </button>
-            <button onclick="event.stopPropagation();" hx-post="/delete?filename=<%= file.file_name %>"
-              hx-target=".file-item<%= index %>"
-              hx-swap="outerHTML swap:0.5s"
-              class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move to recycle bin
-            </button>
-            <button onclick="event.stopPropagation(); openShareFileModal(<%= index %>)"
-              class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Share
-            </button>
+    <% } else { %>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ml-4">
+        <% fileList.forEach((file, index)=> { %>
+          <div
+            class="file-item<%= index %> relative border-[1.5px] border-[#7f848d] p-4 rounded-md flex items-center space-x-4 hover:bg-gray-300 cursor-pointer">
+            <% if (file.is_folder) { %>
+              <img src="img/Folder.png" alt="Folder Icon" class="w-6 h-6">
+              <% } else { %>
+                <img src="img/File.png" alt="File Icon" class="w-6 h-6">
+                <% } %>
+                  <p class="text-sm font-medium text-gray-700 flex-1 truncate pr-10">
+                    <%= file.file_name %>
+                  </p>
+                  <button
+                    class="absolute right-2 text-gray-500 hover:text-gray-700 hover:bg-[#0cbfdfa8] hover:rounded-full focus:outline-none"
+                    onclick="event.stopPropagation(); toggleDropdown(this, <%= index %>)">
+                    <img src="img/ellipsis_dark.png" alt="">
+                  </button>
+                  <div class="dropdown hidden absolute right-0 top-10 mt-2 w-48 z-10 bg-white rounded-md shadow-lg"
+                    id="dropdown<%= index %>">
+                    <% if (!file.is_folder) { %>
+                      <button class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">
+                        <a href="/download?filename=<%= file.file_name %>" class="file-link">Download</a>
+                      </button>
+                      <button onclick="event.stopPropagation(); openCopyFileModal(<%= index %>)"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Copy file
+                      </button>
+                      <% } %>
+                        <button onclick="event.stopPropagation(); openRenameModal(<%= index %>)"
+                          class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Rename
+                        </button>
+                        <button onclick="event.stopPropagation(); openMoveFileModal(<%= index %>)"
+                          class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move file
+                        </button>
+                        <button onclick="event.stopPropagation();" hx-post="/delete?filename=<%= file.file_name %>"
+                          hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s"
+                          class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move to recycle bin
+                        </button>
+                        <button onclick="event.stopPropagation(); openShareFileModal(<%= index %>)"
+                          hx-get="/sharedUsers" hx-vals='{"fileid": "<%= file.file_id %>"}'
+                          hx-target="#shared-users<%= index %>"
+                          class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Share
+                        </button>
+                  </div>
           </div>
-        </div>
-      <% }) %>
-    </div>
-  <% } %>
+          <%- include('renameModal.ejs', {index, file}) %>
+            <%- include('copyFileModal.ejs', {index, file}) %>
+              <%- include('shareFileModal.ejs', {index, file}) %>
+                <%- include('moveFileModal.ejs', {index, file}) %>
+                  <% }) %>
+      </div>
+      <% } %>
+
 </div>

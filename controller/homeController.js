@@ -21,7 +21,6 @@ router.get("/home", jwt.authenticate, async (req, res) => {
 router.get("/recycle-bin", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = userData.user_id;
-
   try {
     const fileList = await files.getDeletedFiles(userId);
     res.render('bin', { fileList, userData, folderId: null });

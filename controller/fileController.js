@@ -4,6 +4,7 @@ const router = express.Router();
 const path = require("path");
 const files = require("../model/files.js");
 const jwt = require("../config/jwt.js");
+const sharing = require("../model/sharingModel.js");
 const bytes = require("bytes");
 const { v4: uuidv4 } = require("uuid");
 
@@ -35,7 +36,7 @@ router.post("/upload", jwt.authenticate, async (req, res) => {
         userData,
         folderName: folderName.rows[0].file_name,
         folderList,
-        entityAmt
+        entityAmt,
       });
     }
   } catch (err) {
@@ -198,22 +199,26 @@ router.post("/rename", jwt.authenticate, async (req, res) => {
     if (parent === null) {
       const fileList = await files.getFilesInRoot(userId);
       const folderList = await files.getUserFolder(userId);
+      let entityAmt = fileList.length + folderList.length;
       res.render("parts/fileList", {
         fileList,
         userData,
         folderName: "",
         folderList,
         folderId: parent || null,
+        entityAmt
       });
     } else {
       const fileList = await files.getFilesInFolder(userId, parent);
       const folderList = await files.getUserFolder(userId);
       const folderName = await files.getFolderName(userId, parent);
+      let entityAmt = fileList.length + folderList.length;
       res.render("parts/fileList", {
         fileList,
         userData,
         folderName: folderName.rows[0].file_name,
         folderList,
+        entityAmt
       });
     }
   } catch (err) {
@@ -233,5 +238,18 @@ router.get("/f/:link", jwt.authenticate, async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
+router.get("/sharedUsers", jwt.authenticate, async (req, res) => {
+  const entityId = req.query.fileid;
+  try {
+    const sharedUserLists = await sharing.getSharedUsers(entityId);
+    res.render('parts/sharedUsers', { sharedUserLists });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send();
+  }
+});
+
+
 
 module.exports = router;
