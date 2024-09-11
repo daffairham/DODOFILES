@@ -46,6 +46,10 @@
                       <button onclick="event.stopPropagation(); openCopyFileModal(<%= index %>)"
                         class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Copy file
                       </button>
+                      <% } else { %>
+                        <button onclick="event.stopPropagation();" class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">
+                          <a href="/downloadFolder/<%= file.file_id %>">Download Folder</a>
+                        </button>
                       <% } %>
                         <button onclick="event.stopPropagation(); openRenameModal(<%= index %>)"
                           class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Rename
