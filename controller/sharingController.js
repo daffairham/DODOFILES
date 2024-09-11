@@ -108,16 +108,18 @@ router.get("/sharedFolder/:folderId", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = req.user.user_id;
   try {
-    const fileList = await files.getFilesInFolder(userId, folderId);
-    const folderName = await files.getFolderName(userId, folderId);
-    const folderList = await files.getUserFolder(userId);
-    res.render("sharedFiles", {
+    const fileList = await files.getFilesInFolder(userId, folderId); 
+    const folderName = await files.getFolderName(userId, folderId);  
+    const folderList = await files.getUserFolder(userId); 
+
+    
+    res.render("parts/sharedFileList", {
       fileList,
       userData,
-      // folderName: folderName.rows[0].file_name,
       folderId,
       folderList,
-      entityAmt: fileList.length
+      entityAmt: fileList.length,
+      layout: false 
     });
   } catch (err) {
     console.error(err);

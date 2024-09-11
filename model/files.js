@@ -230,10 +230,10 @@ const renameEntity = async (fileId, newEntityName) => {
   }
 };
 
-const getEntityIdByName = async (userId, filename) => {
-  const query = `SELECT file_id FROM filesystem_entity WHERE file_name = $1 AND file_owner = $2`;
+const getEntityIdByName = async (filename) => {
+  const query = `SELECT file_id FROM filesystem_entity WHERE file_name = $1`;
   try {
-    const result = await db.query(query, [filename, userId]);
+    const result = await db.query(query, [filename]);
     return result.rows[0];
   } catch (error) {
     console.error("Error getting entity ID by name:", error);
