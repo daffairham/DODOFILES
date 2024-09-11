@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const files = require("../model/files.js");
 const jwt = require("../config/jwt.js");
+const bytes = require("bytes");
 
 router.get("/home", jwt.authenticate, async (req, res) => {
   const userData = req.user;

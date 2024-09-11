@@ -3,9 +3,11 @@ const fs = require("fs");
 const router = express.Router();
 const path = require("path");
 const files = require("../model/files.js");
-const jwt = require("../config/jwt.js");
 const sharing = require("../model/sharingModel.js");
+const users = require("../model/users.js");
+const jwt = require("../config/jwt.js");
 const bytes = require("bytes");
+const { format } = require('date-fns');
 const { v4: uuidv4 } = require("uuid");
 
 router.post("/upload", jwt.authenticate, async (req, res) => {
@@ -102,6 +104,7 @@ router.get("/folder/:folderId", jwt.authenticate, async (req, res) => {
       folderName: folderName.rows[0].file_name,
       folderId,
       folderList,
+      entityAmt: fileList.length
     });
   } catch (err) {
     console.error(err);
@@ -146,21 +149,29 @@ router.post("/copyFile", jwt.authenticate, async (req, res) => {
   const userId = req.user.user_id;
   const filename = req.body.filename;
   const parent = req.body.foldernames === "null" ? null : req.body.foldernames;
-  const uniqueName = uuidv4();
-  const entityLink = uuidv4();
+  const entityLink = uuidv4(); 
   const fileSize = req.body.fileSize;
   const isFolder = req.body.isFolder;
-  const sourceFilename = req.body.sourceFilename;
+  const sourceFilename = req.body.sourceFilename; 
 
   try {
-    await files.copyFile(filename, new Date(), fileSize, parent, userId, isFolder, uniqueName, entityLink, sourceFilename);
+    await files.copyFile(
+      filename,
+      new Date(),
+      fileSize,
+      parent,
+      userId,
+      isFolder,
+      sourceFilename, 
+      entityLink
+    );
+    
     const result = await files.getEntityIdByName(userId, filename);
     const parentDestination = result.file_id;
 
     if (Number(parent) === parentDestination) {
-      res.status(200).send();
+      res.status(200).send("File copied successfully.");
     } else {
-      console.log("File copied successfully.", parent, parentDestination);
       res.status(200).send();
     }
   } catch (err) {
@@ -250,6 +261,19 @@ router.get("/sharedUsers", jwt.authenticate, async (req, res) => {
   }
 });
 
-
+router.get("/properties", jwt.authenticate, async (req, res) => {
+  const entityId = req.query.fileid;
+  try {
+    const fileDetails = await files.getEntityDetailsById(entityId);
+    const size = bytes(fileDetails[0].size);
+    const owner = await users.getUsernameById(fileDetails[0].file_owner)
+    const date = format(new Date(fileDetails[0].upload_date), 'dd MMMM yyyy');
+    console.log(owner);
+    res.render('parts/propertiesDetails', { fileDetails, size, date, owner: owner.username });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send();
+  }
+});
 
 module.exports = router;

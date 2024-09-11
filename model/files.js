@@ -1,5 +1,6 @@
 const db = require("../config/db.js");
-const fs = require("fs");
+const sharing = require("../model/sharingModel.js");
+const fs = require("fs").promises;
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
 
@@ -84,21 +85,49 @@ const getFolderName = async (userId, folderId) => {
 };
 
 const downloadFile = async (filename, userId, res) => {
-  const query = `SELECT * FROM filesystem_entity WHERE file_name = $1 AND file_owner = $2 AND deleted_date IS NULL`;
+  const getFileQuery = `SELECT file_id, unique_filename, file_owner
+                        FROM filesystem_entity
+                        WHERE file_name = $1`;
   try {
-    const result = await db.query(query, [filename, userId]);
-    if (result.rows.length > 0) {
-      const file = result.rows[0];
-      const filePath = path.join(__dirname, "../files", file.unique_filename);
-      res.download(filePath, filename);
-    } else {
-      res.status(404).send("File not found");
+    const fileResult = await db.query(getFileQuery, [filename]);
+    if (fileResult.rows.length === 0) {
+      return res.status(404).send("File not found.");
     }
-  } catch (error) {
-    console.error("Error downloading file:", error);
-    throw error;
+    const fileData = fileResult.rows[0];
+    const fileOwner = fileData.file_owner;
+    const uniqueFilename = fileData.unique_filename;
+    if (fileOwner === userId) {
+      const filePath = path.join(__dirname, "..", "files", uniqueFilename);
+      return res.download(filePath, filename, (err) => {
+        if (err) {
+          console.error("Error downloading file:", err);
+          return res.status(500).send("Internal Server Error");
+        }
+      });
+    } else {
+      const checkSharedAccessQuery = `SELECT * 
+                                      FROM shared_files 
+                                      WHERE file_id = $1 AND user_id = $2`;
+      const sharedResult = await db.query(checkSharedAccessQuery, [fileData.file_id, userId]);
+      if (sharedResult.rows.length === 0) {
+        console.log(userId, fileData);
+        return res.status(403).send("You don't have permission to download this file.");
+      } else {
+        const filePath = path.join(__dirname, "..", "files", uniqueFilename);
+        return res.download(filePath, filename, (err) => {
+          if (err) {
+            console.error("Error", err);
+            return res.status(500).send("Server Error");
+          }
+        });
+      }
+    }
+  } catch (err) {
+    console.error("Error", err);
+    return res.status(500).send("Server Error");
   }
 };
+
 
 const moveToBin = async (filename, userId) => {
   const query = `UPDATE filesystem_entity SET deleted_date = $1 WHERE file_name = $2 AND file_owner = $3`;
@@ -142,22 +171,36 @@ const moveFile = async (userId, filename, parent) => {
 };
 
 const copyFile = async (
-  filename,
+  fileName,
   uploadDate,
-  size,
-  parent,
+  fileSize,
+  parentID,
   fileOwner,
-  uniqueFilename,
-  entityLink,
-  sourceFilename
+  isFolder,
+  sourceUniqueName, 
+  entityLink
 ) => {
+  const uniqueName = uuidv4(); 
   const query = `INSERT INTO filesystem_entity(file_name, upload_date, size, parent, deleted_date, file_owner, is_folder, unique_filename, entity_link)
-                    SELECT file_name, $1, size, $2, deleted_date, $3, is_folder, $4, $5
-                    FROM filesystem_entity
-                    WHERE file_name = $6 AND file_owner = $7`;
+                  VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, $8)`;
 
   try {
-    await db.query(query, [uploadDate, parent, fileOwner, uniqueFilename, entityLink, sourceFilename, fileOwner]);
+    await db.query(query, [
+      fileName,
+      uploadDate,
+      fileSize,
+      parentID || null,
+      fileOwner,
+      isFolder,
+      uniqueName, 
+      entityLink,
+    ]);
+    const sourcePath = path.join(__dirname, "../files", sourceUniqueName); 
+    const destinationPath = path.join(__dirname, "../files", uniqueName); 
+    
+    await fs.copyFile(sourcePath, destinationPath); 
+    console.log('File copied successfully');
+    
   } catch (error) {
     console.error("Error copying file:", error);
     throw error;
@@ -198,10 +241,32 @@ const getEntityIdByName = async (userId, filename) => {
   }
 };
 
+const getEntityNameById = async (entity_id) => {
+  const query = `SELECT file_name FROM filesystem_entity WHERE file_id = $1`;
+  try {
+    const result = await db.query(query, [entity_id,]);
+    return result.rows[0];
+  } catch (error) {
+    console.error("Error getting name", error);
+    throw error;
+  }
+};
+
 const getEntityDetailsByLink = async (link) => {
   const query = `SELECT * FROM filesystem_entity WHERE entity_link = $1`;
   try {
     const result = await db.query(query, [link]);
+    return result.rows;
+  } catch (error) {
+    console.error("Error retrieving entity details by link:", error);
+    throw error;
+  }
+};
+
+const getEntityDetailsById = async (entityId) => {
+  const query = `SELECT * FROM filesystem_entity WHERE file_id = $1`;
+  try {
+    const result = await db.query(query, [entityId]);
     return result.rows;
   } catch (error) {
     console.error("Error retrieving entity details by link:", error);
@@ -224,5 +289,7 @@ module.exports = {
   createFolder,
   renameEntity,
   getEntityIdByName,
-  getEntityDetailsByLink
+  getEntityNameById,
+  getEntityDetailsByLink,
+  getEntityDetailsById
 };

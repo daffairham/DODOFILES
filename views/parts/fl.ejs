@@ -62,17 +62,12 @@
                           hx-target="#shared-users<%= index %>"
                           class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Share
                         </button>
-                        <button onclick="event.stopPropagation(); openPropertiesModal(<%= index %>)"
-                          hx-get="/properties" hx-target="#entity-details<%= index %>" hx-vals='{"fileid": "<%= file.file_id %>"}'
-                          class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Properties
-                        </button>
                   </div>
           </div>
           <%- include('renameModal.ejs', {index, file}) %>
             <%- include('copyFileModal.ejs', {index, file}) %>
               <%- include('shareFileModal.ejs', {index, file}) %>
                 <%- include('moveFileModal.ejs', {index, file}) %>
-                <%- include('propertiesModal.ejs', {index, file}) %>
                   <% }) %>
       </div>
       <% } %>

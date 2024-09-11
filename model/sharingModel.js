@@ -1,3 +1,4 @@
+const { download } = require("express/lib/response.js");
 const db = require("../config/db.js");
 
 const getSharedFiles = async (userId) => {
@@ -72,7 +73,7 @@ const saveSharedLink = async (permissionId, sharedLink) => {
 
 const getSharedUsers = async (entity_id) => {
   try {
-    const query = `SELECT shared_files.file_id, file_name, username, email, permission 
+    const query = `SELECT shared_files.user_id, shared_files.file_id, file_name, username, email, permission 
                     FROM shared_files 
                     INNER JOIN filesystem_entity
                     ON shared_files.file_id = filesystem_entity.file_id
@@ -80,6 +81,21 @@ const getSharedUsers = async (entity_id) => {
                     ON shared_files.user_id = users.user_id
                     WHERE shared_files.file_id = $1`;
     const result = await db.query(query, [entity_id]);
+    return result.rows;
+  } catch (err) {
+    console.error("Error getting shared users:", err);
+    throw err;
+  }
+};
+
+const removeAccessFromOwner = async (user_id, entity_id) => {
+  try {
+    const query = `DELETE FROM shared_files
+                    USING filesystem_entity
+                    WHERE shared_files.file_id = filesystem_entity.file_id
+                    AND shared_files.user_id = $1
+                    AND filesystem_entity.file_name = $2`;
+    const result = await db.query(query, [user_id, entity_id]);
     return result.rows;
   } catch (err) {
     console.error("Error getting shared users:", err);
@@ -102,6 +118,23 @@ const removeSharedAccess = async (user_id, entity_id) => {
   }
 };
 
+const downloadSharedFile = async (filename, userId, res) => {
+  const query = `SELECT * FROM filesystem_entity WHERE file_name = $1 AND file_owner = $2 AND deleted_date IS NULL`;
+  try {
+    const result = await db.query(query, [filename, userId]);
+    if (result.rows.length > 0) {
+      const file = result.rows[0];
+      const filePath = path.join(__dirname, "../files", file.unique_filename);
+      res.download(filePath, filename);
+    } else {
+      res.status(404).send("File not found");
+    }
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   grantPermission,
   saveSharedLink,
@@ -109,5 +142,7 @@ module.exports = {
   getUserIdToShare,
   checkPermissionExist,
   getSharedUsers,
-  removeSharedAccess
+  removeSharedAccess,
+  removeAccessFromOwner,
+  downloadSharedFile
 };

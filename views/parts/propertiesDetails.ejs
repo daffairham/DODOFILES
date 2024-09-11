@@ -1,0 +1,30 @@
+<% fileDetails.forEach(file=> { %>
+<div class="mb-2">
+    <h1 class="text-[#0CC0DF]">File Name:</h1>
+    <span class="text-[#7f848d]">
+        <%= file.file_name %>
+    </span>
+</div>
+<div class="mb-2">
+    <h1 class="text-[#0CC0DF]">File Size:</h1>
+    <span class="text-[#7f848d]">
+        <%= size %>
+    </span>
+</div>
+<div class="mb-2">
+    <h1 class="text-[#0CC0DF]">Uploaded at:</h1>
+    <span class="text-[#7f848d]">
+        <%= date %>
+    </span>
+</div>
+<div class="mb-2">
+    <h1 class="text-[#0CC0DF]">Last Modified:</h1>
+    <span class="text-[#7f848d]">belum bikin fungsinya</span>
+</div>
+<div class="mb-2">
+    <h1 class="text-[#0CC0DF]">File Owner:</h1>
+    <span class="text-[#7f848d]">
+        <%= owner %>
+    </span>
+</div>
+<% }) %>

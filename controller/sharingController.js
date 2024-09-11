@@ -4,6 +4,7 @@ const router = express.Router();
 const path = require("path");
 const sharing = require("../model/sharingModel.js");
 const jwt = require("../config/jwt.js");
+const files = require("../model/files.js");
 
 router.post("/share", jwt.authenticate, async (req, res) => {
   const targetEmail = req.body.email;
@@ -30,6 +31,20 @@ router.post("/share", jwt.authenticate, async (req, res) => {
   }
 });
 
+router.post("/removeAccess", jwt.authenticate, async (req, res) => {
+  const userId = req.body.userId;
+  const entityId = req.body.entityid;
+  const result = await files.getEntityNameById(entityId);
+  const entityName = result.file_name;
+  try {
+    sharing.removeSharedAccess(userId, entityName);
+    res.status(200).send();
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error");
+  }
+});
+
 router.get("/shared-files", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = jwt.getIdFromToken(req.cookies.token);
@@ -45,10 +60,9 @@ router.get("/shared-files", jwt.authenticate, async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("An error occurred while retrieving shared files.");
+    res.status(500).send("Error");
   }
 });
-
 
 router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
   const userData = req.user;
@@ -59,11 +73,8 @@ router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
     res.status(200).send();
   } catch (err) {
     console.error(err);
-    res.status(500).send("An error occurred while retrieving shared files.");
+    res.status(500).send("Error");
   }
 });
-
-
-
 
 module.exports = router;

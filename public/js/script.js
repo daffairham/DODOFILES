@@ -38,6 +38,14 @@ function closeShareFileModal(index) {
   document.getElementById(`share-file-modal${index}`).classList.add("hidden");
 }
 
+function openPropertiesModal(index) {
+  document.getElementById(`properties-modal${index}`).classList.remove("hidden");
+}
+
+function closePropertiesModal(index) {
+  document.getElementById(`properties-modal${index}`).classList.add("hidden");
+}
+
 function toggleDropdown(button, index) {
   const allDropdowns = document.querySelectorAll('.dropdown');
   allDropdowns.forEach(dropdown => {
