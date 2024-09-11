@@ -86,6 +86,7 @@ router.post("/restore", jwt.authenticate, async (req, res) => {
   }
 });
 
+
 router.get("/folder/:folderId", jwt.authenticate, async (req, res) => {
   const folderId = req.params.folderId;
   const userData = req.user;
@@ -93,10 +94,6 @@ router.get("/folder/:folderId", jwt.authenticate, async (req, res) => {
   try {
     const fileList = await files.getFilesInFolder(userId, folderId);
     const folderName = await files.getFolderName(userId, folderId);
-    if (folderName.rows.length === 0) {
-      res.status(403).send("You don't have permission to this folder.");
-      return;
-    }
     const folderList = await files.getUserFolder(userId);
     res.render("index", {
       fileList,
@@ -266,10 +263,9 @@ router.get("/properties", jwt.authenticate, async (req, res) => {
   try {
     const fileDetails = await files.getEntityDetailsById(entityId);
     const size = bytes(fileDetails[0].size);
-    const owner = await users.getUsernameById(fileDetails[0].file_owner)
+    const owner = await users.getUserDetailsById(fileDetails[0].file_owner)
     const date = format(new Date(fileDetails[0].upload_date), 'dd MMMM yyyy');
-    console.log(owner);
-    res.render('parts/propertiesDetails', { fileDetails, size, date, owner: owner.username });
+    res.render('parts/propertiesDetails', { fileDetails, size, date, owner: owner.username, ownerEmail: owner.email });
   } catch (err) {
     console.error(err);
     res.status(500).send();

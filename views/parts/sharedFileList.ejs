@@ -5,7 +5,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ml-4">
     <% fileList.forEach((file, index)=> { %>
       <% if (file.is_folder) { %>
-        <div hx-get="/folder/<%= file.file_id %>" hx-trigger="click" hx-boost="true" hx-target=".main"
+        <div hx-get="/sharedFolder/<%= file.file_id %>" hx-trigger="click" hx-boost="true" hx-target=".main"
           hx-swap="outerHTML"
           class="file-item<%= index %> relative border-[1.5px] border-[#7f848d] p-4 rounded-md flex items-center space-x-4 hover:bg-gray-300 cursor-pointer">
           <img src="img/Folder.png" alt="Folder Icon" class="w-6 h-6">
@@ -35,14 +35,14 @@
                     <button class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]"><a
                         href="/download?filename=<%= file.file_name %>" class="file-link">Download</a></button>
                     <% } %>
-                      <button onclick="event.stopPropagation(); openRenameModal(<%= index %>)"
+                      <button onclick="event.stopPropagation(); openRenameSharedModal(<%= index %>)"
                         class="px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Rename</button>
                       <button hx-post="/removeSharedFile?filename=<%= file.file_name %>"
                         hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s"
                         class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 val">Remove Access</button>
                 </div>
             </div>
-            <%- include('renameModal.ejs', {index, file}) %>
+            <%- include('renameSharedModal.ejs', {index, file}) %>
               <% }) %>
         </div>
   </div>

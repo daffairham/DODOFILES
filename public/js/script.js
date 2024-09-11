@@ -14,6 +14,14 @@ function closeRenameModal(index) {
   document.getElementById(`rename-modal${index}`).classList.add("hidden");
 }
 
+function openRenameSharedModal(index) {
+  document.getElementById(`renameshared-modal${index}`).classList.remove("hidden");
+}
+
+function closeRenameSharedModal(index) {
+  document.getElementById(`renameshared-modal${index}`).classList.add("hidden");
+}
+
 function openMoveFileModal(index) {
   document.getElementById(`move-file-modal${index}`).classList.remove("hidden");
 }

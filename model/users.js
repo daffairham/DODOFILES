@@ -35,9 +35,9 @@ const checkUserExist = async (username) => {
   }
 };
 
-const getUsernameById = async (userId) => {
+const getUserDetailsById = async (userId) => {
   try {
-    const QUERY = `SELECT username FROM users WHERE user_id = $1`;
+    const QUERY = `SELECT username, email FROM users WHERE user_id = $1`;
     const { rows } = await db.query(QUERY, [userId]);
     return rows[0];
   } catch (error) {
@@ -46,4 +46,4 @@ const getUsernameById = async (userId) => {
   }
 };
 
-module.exports = { getUser, addUser, checkUserExist, getUsernameById };
+module.exports = { getUser, addUser, checkUserExist, getUserDetailsById };
