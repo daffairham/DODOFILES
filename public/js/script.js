@@ -14,6 +14,14 @@ function closeUploadMultiModal() {
   document.getElementById("uploadmulti-modal").classList.add("hidden");
 }
 
+function openUploadFolderModal() {
+  document.getElementById("uploadfolder-modal").classList.remove("hidden");
+}
+
+function closeUploadFolderModal() {
+  document.getElementById("uploadfolder-modal").classList.add("hidden");
+}
+
 function openRenameModal(index) {
   document.getElementById(`rename-modal${index}`).classList.remove("hidden");
 }

@@ -6,8 +6,22 @@ const getSharedFiles = async (userId) => {
     const query = `SELECT * FROM shared_files 
                    INNER JOIN filesystem_entity 
                    ON shared_files.file_id = filesystem_entity.file_id
-                   WHERE user_id = $1`;
+                   WHERE user_id = $1 AND parent IS NULL`;
     const result = await db.query(query, [userId]);
+    return result.rows;
+  } catch (err) {
+    console.error("Error:", err);
+    throw err;
+  }
+};
+
+const getSharedFolderFiles = async (userId, parent) => {
+  try {
+    const query = `SELECT * FROM shared_files 
+                   INNER JOIN filesystem_entity 
+                   ON shared_files.file_id = filesystem_entity.file_id
+                   WHERE user_id = $1 AND parent = $2`;
+    const result = await db.query(query, [userId, parent]);
     return result.rows;
   } catch (err) {
     console.error("Error:", err);
@@ -28,6 +42,7 @@ const checkPermissionExist = async (userId, entityId) => {
 
 const grantPermission = async (userId, entityId, permission) => {
   try {
+    
     const query = `
       INSERT INTO shared_files (user_id, file_id, permission)
       SELECT $1, $2, $3
@@ -118,31 +133,14 @@ const removeSharedAccess = async (user_id, entity_id) => {
   }
 };
 
-const downloadSharedFile = async (filename, userId, res) => {
-  const query = `SELECT * FROM filesystem_entity WHERE file_name = $1 AND file_owner = $2 AND deleted_date IS NULL`;
-  try {
-    const result = await db.query(query, [filename, userId]);
-    if (result.rows.length > 0) {
-      const file = result.rows[0];
-      const filePath = path.join(__dirname, "../files", file.unique_filename);
-      res.download(filePath, filename);
-    } else {
-      res.status(404).send("File not found");
-    }
-  } catch (error) {
-    console.error("Error downloading file:", error);
-    throw error;
-  }
-};
-
 module.exports = {
   grantPermission,
   saveSharedLink,
   getSharedFiles,
+  getSharedFolderFiles,
   getUserIdToShare,
   checkPermissionExist,
   getSharedUsers,
   removeSharedAccess,
   removeAccessFromOwner,
-  downloadSharedFile
 };

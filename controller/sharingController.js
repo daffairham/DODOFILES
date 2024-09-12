@@ -9,11 +9,12 @@ const files = require("../model/files.js");
 router.post("/share", jwt.authenticate, async (req, res) => {
   const targetEmail = req.body.email;
   const entityId = req.body.entityid;
-  let permission = req.body.permission === "1" ? "r" : "rw";
+  let permission = req.body.permission === "1" ? "rw" : "r";
 
   try {
+    const entityTipe = await files.checkEntityType(entityId);
+    const isFolder = entityTipe.is_folder;
     const userId = await sharing.getUserIdToShare(targetEmail);
-
     const permissionExist = await sharing.checkPermissionExist(
       userId,
       entityId
@@ -24,9 +25,18 @@ router.post("/share", jwt.authenticate, async (req, res) => {
       return;
     }
 
+    if (isFolder) {
+      await sharing.grantPermission(userId, entityId, permission); //kasih akses untuk folder
+      const childrenEntity = await files.getChildFromParent(entityId);
+      for (const file_id of childrenEntity) {
+        await sharing.grantPermission(userId, file_id.file_id, permission); //kasih akses untuk entity dlm folder
+      }
+    } else {
+      await sharing.grantPermission(userId, entityId, permission);
+    }
+
     await sharing.grantPermission(userId, entityId, permission);
     console.log("File shared.");
-
     res.redirect(req.originalUrl);
   } catch (err) {
     console.error(err);
@@ -40,6 +50,21 @@ router.post("/removeAccess", jwt.authenticate, async (req, res) => {
   const result = await files.getEntityNameById(entityId);
   const entityName = result.file_name;
   try {
+    const entityTipe = await files.checkEntityType(entityId);
+    const isFolder = entityTipe.is_folder;
+    console.log(isFolder);
+    if (isFolder) {
+      await sharing.removeSharedAccess(userId, entityName); 
+      const childrenEntity = await files.getChildFromParent(entityId);
+      for (const file_id of childrenEntity) {
+        const id = await files.getEntityNameById(file_id.file_id)
+        const childrenName = id.file_name;
+        await sharing.removeSharedAccess(userId, childrenName); //kasih akses untuk entity dlm folder
+      }
+    } else {
+      const id = await files.getEntityIdByName(entityName)
+      await sharing.removeSharedAccess(userId, id.file_id);
+    }
     sharing.removeSharedAccess(userId, entityName);
     res.status(200).send();
   } catch (err) {
@@ -71,7 +96,24 @@ router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = jwt.getIdFromToken(req.cookies.token);
   const entityName = req.query.filename;
+  const getId = await files.getEntityIdByName(entityName);
+  const entityId = getId.file_id
   try {
+    const entityTipe = await files.checkEntityType(entityId);
+    const isFolder = entityTipe.is_folder;
+    console.log(isFolder);
+    if (isFolder) {
+      await sharing.removeSharedAccess(userId, entityName); 
+      const childrenEntity = await files.getChildFromParent(entityId);
+      for (const file_id of childrenEntity) {
+        const id = await files.getEntityNameById(file_id.file_id)
+        const childrenName = id.file_name;
+        await sharing.removeSharedAccess(userId, childrenName); //kasih akses untuk entity dlm folder
+      }
+    } else {
+      const id = await files.getEntityIdByName(entityName)
+      await sharing.removeSharedAccess(userId, id.file_id);
+    }
     sharing.removeSharedAccess(userId, entityName);
     res.status(200).send();
   } catch (err) {
@@ -88,14 +130,13 @@ router.post("/renameSharedFile", jwt.authenticate, async (req, res) => {
   const parent = req.body.currentFolder || null;
   try {
     await files.renameEntity(file_id, newEntityName);
-    const fileList = await files.getFilesInRoot(userId);
-    const folderList = await files.getUserFolder(userId);
+    const fileList = await sharing.getSharedFiles(userId);
     res.render("parts/sharedFileList", {
       fileList,
       userData,
       folderName: "",
-      folderList,
-      folderId: parent,
+      folderId: null,
+      entityAmt: fileList.length,
     });
   } catch (err) {
     console.error(err);
@@ -108,19 +149,54 @@ router.get("/sharedFolder/:folderId", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = req.user.user_id;
   try {
-    const fileList = await files.getFilesInFolder(userId, folderId); 
-    const folderName = await files.getFolderName(userId, folderId);  
-    const folderList = await files.getUserFolder(userId); 
+    const fileList = await sharing.getSharedFolderFiles(userId, folderId);
+    const folderName = await files.getFolderName(userId, folderId);
+    const folderList = await files.getUserFolder(userId);
 
-    
-    res.render("parts/sharedFileList", {
+    res.render("sharedFiles", {
       fileList,
       userData,
       folderId,
       folderList,
       entityAmt: fileList.length,
-      layout: false 
     });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+router.post("/testingShare", jwt.authenticate, async (req, res) => {
+  const userData = req.user;
+  const userId = jwt.getIdFromToken(req.cookies.token);
+  const targetEmail = req.body.email;
+  const entityId = req.body.entityid;
+  let permission = req.body.permission === "1" ? "rw" : "r";
+  const parent = req.body.currentFolder || null;
+  try {
+    const entityTipe = await sharing.testingShare(entityId);
+    const isFolder = entityTipe.is_folder;
+    const userId = await sharing.getUserIdToShare(targetEmail);
+
+    const permissionExist = await sharing.checkPermissionExist(
+      userId,
+      entityId
+    );
+
+    if (permissionExist.rows > 0) {
+      res.send("User already has access to this file/folder");
+      return;
+    }
+    if (isFolder) {
+      await sharing.grantPermission(userId, entityId, permission);
+      const childrenEntity = await files.getChildFromParent(entityId);
+      for (const file_id of childrenEntity) {
+        await sharing.grantPermission(userId, file_id.file_id, permission);
+      }
+    } else {
+      await sharing.grantPermission(userId, entityId, permission);
+    }
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");

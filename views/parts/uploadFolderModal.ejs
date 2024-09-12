@@ -1,0 +1,16 @@
+<div class="modal-content bg-white rounded-lg p-8 md:flex flex-col">
+  <div id="file-modal">
+    <span class="text-center text-[#0CC0DF] ml-2 mb-6 font-medium text-lg">Upload a folder</span>
+    <form id="uploadForm" hx-post="/uploadFolder" hx-encoding="multipart/form-data" hx-target="#content"
+      hx-vals='{"folderId": "<%= folderId %>"}' class="flex flex-col items-center gap-2 mt-4" onsubmit="closeUploadFolderModal()">
+      <input type="file" webkitdirectory="true" multiple name="file" id="filepicker" required
+        class="ml-2 mb-2 text-[#A2A6AD]" />
+      <input type="hidden" name="uploadedFolderName" id="uploadedFolderName" />
+      <div class="md:flex items-center justify-center">
+        <input type="submit" value="Upload"
+          class="bg-[#0CC0DF] hover:bg-[#36b3c9] cursor-pointer text-white font-light text-lg py-4 px-8 rounded" />
+      </div>
+    </form>
+  </div>
+</div>
+

@@ -5,28 +5,28 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 ml-4">
     <% fileList.forEach((file, index)=> { %>
       <% if (file.is_folder) { %>
-        <div hx-get="/sharedFolder/<%= file.file_id %>" hx-trigger="click" hx-boost="true" hx-target="#content"
-          hx-swap="outerHTML"
+        <div hx-get="/sharedFolder/<%= file.file_id %>" hx-trigger="click" hx-push-url="true" hx-boost="true"
+          hx-target=".main" hx-swap="outerHTML"
           class="file-item<%= index %> relative border-[1.5px] border-[#7f848d] p-4 rounded-md flex items-center space-x-4 hover:bg-gray-300 cursor-pointer">
-          <img src="img/Folder.png" alt="Folder Icon" class="w-6 h-6">
+          <img src="/img/Folder.png" alt="Folder Icon" class="w-6 h-6">
           <p class="text-sm font-medium text-gray-700 flex-1 truncate pr-10">
             <%= file.file_name %>
           </p>
-          <button class="absolute right-2 text-gray-500 hover:text-gray-700 focus:outline-none"
+          <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 hover:bg-[#0cbfdfa8] hover:rounded-full focus:outline-none"
             onclick="event.stopPropagation(); toggleDropdown(this, <%= index %>)">
-            <img src="img/ellipsis_dark.png" alt="">
+            <img src="/img/ellipsis_dark.png" alt="">
           </button>
           <% } else { %>
             <div
               class="file-item<%= index %> relative border-[1.5px] border-[#7f848d] p-4 rounded-md flex items-center space-x-4 hover:bg-gray-300 cursor-pointer">
-              <img src="img/File.png" alt="File Icon" class="w-6 h-6">
+              <img src="/img/File.png" alt="File Icon" class="w-6 h-6">
               <p class="text-sm font-medium text-gray-700 flex-1 truncate pr-10">
                 <%= file.file_name %>
               </p>
               <button
                 class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 hover:bg-[#0cbfdfa8] hover:rounded-full focus:outline-none"
                 onclick="event.stopPropagation(); toggleDropdown(this, <%= index %>)">
-                <img src="img/ellipsis_dark.png" alt="">
+                <img src="/img/ellipsis_dark.png" alt="">
               </button>
               <% } %>
                 <div class="dropdown hidden absolute right-0 top-10 mt-2 w-48 z-10 bg-white rounded-md shadow-lg"
@@ -35,11 +35,20 @@
                     <button class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]"><a
                         href="/download?filename=<%= file.file_name %>" class="file-link">Download</a></button>
                     <% } %>
-                      <button onclick="event.stopPropagation(); openRenameSharedModal(<%= index %>)"
-                        class="px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Rename</button>
-                      <button hx-post="/removeSharedFile?filename=<%= file.file_name %>"
-                        hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s"
-                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 val">Remove Access</button>
+                      <% if (file.file_permission === 'rw') { %>
+                        <button onclick="event.stopPropagation(); openRenameSharedModal(<%= index %>)"
+                          class="px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">
+                          Rename
+                        </button>
+                        <% } else { %>
+                          <button disabled
+                            class="px-4 py-2 text-sm text-gray-500">
+                            Rename
+                          </button>
+                          <% } %>
+                            <button hx-post="/removeSharedFile?filename=<%= file.file_name %>"
+                              hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s"
+                              class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 val">Remove Access</button>
                 </div>
             </div>
             <%- include('renameSharedModal.ejs', {index, file}) %>

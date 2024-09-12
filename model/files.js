@@ -274,6 +274,34 @@ const getEntityDetailsById = async (entityId) => {
   }
 };
 
+const getChildFromParent = async (parent) => {
+  const query = `SELECT file_id 
+                  FROM filesystem_entity
+                  WHERE filesystem_entity.parent = $1
+                              `;
+  try {
+    const result = await db.query(query, [parent]);
+    return result.rows
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    throw error;
+  }
+};
+
+const checkEntityType = async (entityId) => {
+  const query = `SELECT is_folder
+                              FROM filesystem_entity
+                              WHERE file_id = $1
+                              `;
+  try {
+    const result = await db.query(query, [entityId]);
+    return result.rows[0]
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   uploadFile,
   getFilesInFolder,
@@ -291,5 +319,7 @@ module.exports = {
   getEntityIdByName,
   getEntityNameById,
   getEntityDetailsByLink,
-  getEntityDetailsById
+  getEntityDetailsById,
+  getChildFromParent,
+  checkEntityType
 };

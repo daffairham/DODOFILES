@@ -87,6 +87,46 @@ router.post("/uploadMultiple", jwt.authenticate, async (req, res) => {
   }
 });
 
+router.post("/uploadFolder", jwt.authenticate, async (req, res) => {
+  const filesUploaded = req.files.file;
+  const folderName = req.body.folderName;
+  const userData = req.user;
+  const userId = jwt.getIdFromToken(req.cookies.token);
+  const parent = req.body.folderId || null;
+  try {
+    for (const file of filesUploaded){
+      await files.uploadFile(file, parent, userId);
+    }
+    if (parent === null) {
+      const fileList = await files.getFilesInRoot(userId);
+      const folderList = await files.getUserFolder(userId);
+      let entityAmt = fileList.length + folderList.length;
+      res.render("parts/fileList", {
+        fileList,
+        userData,
+        folderName: "",
+        folderList,
+        entityAmt,
+      });
+    } else {
+      const fileList = await files.getFilesInFolder(userId, parent);
+      const folderList = await files.getUserFolder(userId);
+      let entityAmt = fileList.length + folderList.length;
+      const folderName = await files.getFolderName(userId, parent);
+      res.render("parts/fileList", {
+        fileList,
+        userData,
+        folderName: folderName.rows[0].file_name,
+        folderList,
+        entityAmt,
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server Error");
+  }
+});
+
 router.get("/download", jwt.authenticate, async (req, res) => {
   const fileName = req.query.filename;
   const userId = jwt.getIdFromToken(req.cookies.token);
