@@ -1,0 +1,23 @@
+<div class="md:flex flex-col">
+    <form hx-post="/changePermission" hx-vals='{"userId": "<%= user.user_id %>"}' class="md:flex md:flex-col justify-start border-b border-gray-300">
+        <span>
+            <%= user.username %>
+        </span>
+        <span class="text-[#A2A6AD]">
+            <%= user.email %>
+        </span>
+        <div class="md:flex md:flex-row items-center justify-between">
+            <label for="userpermission"><span class="text-blue-500">
+                    <%= user.username %>'s
+                </span> permission: </label>
+            <select name="userpermission" id="userpermission"
+                class="text-green-600 cursor-pointer border-2 rounded-md border-gray-400">
+                <option value="view" <%=user.permission==='r' ? 'selected' : '' %>>View</option>
+                <option value="edit" <%=user.permission==='rw' ? 'selected' : '' %>>Edit</option>
+            </select>
+        </div>
+
+        <input class="cursor-pointer border-2 border-green-500 p-2 mt-4 mb-2 rounded-md bg-green-500 text-white hover:border-green-600 hover:bg-green-600"
+            type="submit" value="Change permission">
+    </form>
+</div>

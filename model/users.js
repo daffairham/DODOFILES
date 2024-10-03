@@ -46,4 +46,18 @@ const getUserDetailsById = async (userId) => {
   }
 };
 
-module.exports = { getUser, addUser, checkUserExist, getUserDetailsById };
+const getUserPermission = async (userId, entityId) => {
+  try {
+    const query = `SELECT users.user_id, users.username, users.email, shared_files.permission
+                    FROM users
+                    INNER JOIN shared_files
+                    ON users.user_id = shared_files.user_id
+                    WHERE users.user_id = $1 AND shared_files.file_id = $2`;
+    const result = await db.query(query, [userId, entityId]);
+    return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
+module.exports = { getUser, addUser, checkUserExist, getUserDetailsById, getUserPermission };

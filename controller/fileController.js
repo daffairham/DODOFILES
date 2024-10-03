@@ -1,6 +1,6 @@
 const express = require("express");
 const fs = require("fs");
-const archiver = require('archiver');
+const archiver = require("archiver");
 const router = express.Router();
 const path = require("path");
 const files = require("../model/files.js");
@@ -17,7 +17,13 @@ router.post("/upload", jwt.authenticate, async (req, res) => {
   const userId = jwt.getIdFromToken(req.cookies.token);
   const parent = req.body.folderId || null;
   try {
-    await files.uploadFile(file, parent, userId);
+    const uploadedFile = await files.uploadFile(file, parent, userId);
+
+    if (parent !== null) {
+      console.log(uploadedFile);
+      await sharing.handleNewUpload(uploadedFile.file_id, parent, userId);
+    }
+
     if (parent === null) {
       const fileList = await files.getFilesInRoot(userId);
       const folderList = await files.getUserFolder(userId);
@@ -54,7 +60,7 @@ router.post("/uploadMultiple", jwt.authenticate, async (req, res) => {
   const userId = jwt.getIdFromToken(req.cookies.token);
   const parent = req.body.folderId || null;
   try {
-    for (const file of filesUploaded){
+    for (const file of filesUploaded) {
       await files.uploadFile(file, parent, userId);
     }
     if (parent === null) {
@@ -93,8 +99,9 @@ router.post("/uploadFolder", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = jwt.getIdFromToken(req.cookies.token);
   const parent = req.body.folderId || null;
+  console.log(req.files);
   try {
-    for (const file of filesUploaded){
+    for (const file of filesUploaded) {
       await files.uploadFile(file, parent, userId);
     }
     if (parent === null) {
@@ -142,11 +149,9 @@ router.get("/download", jwt.authenticate, async (req, res) => {
   }
 });
 
-router.get('/downloadFolder/:folderId', jwt.authenticate, async (req, res) => {
+router.get("/downloadFolder/:folderId", jwt.authenticate, async (req, res) => {
   try {
-    
-  } catch (err) {
-  }
+  } catch (err) {}
 });
 
 router.post("/delete", jwt.authenticate, async (req, res) => {
@@ -270,7 +275,18 @@ router.post("/createFolder", jwt.authenticate, async (req, res) => {
     req.body.folderparent === "null" ? null : req.body.folderparent;
 
   try {
-    await files.createFolder(fileName, new Date(), parent, userId);
+    const newFolder = await files.createFolder(
+      fileName,
+      new Date(),
+      parent,
+      userId,
+      new Date()
+    );
+
+    console.log("cf", newFolder.file_id, parent, userId);
+    if (parent !== null) {
+      await sharing.handleNewUpload(newFolder.file_id, parent, userId);
+    }
     if (parent !== null) {
       res.redirect(`/folder/${parent}`);
     } else {
@@ -278,7 +294,7 @@ router.post("/createFolder", jwt.authenticate, async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error creating folder.");
+    res.status(500).send();
   }
 });
 
@@ -287,8 +303,8 @@ router.post("/rename", jwt.authenticate, async (req, res) => {
   const userId = jwt.getIdFromToken(req.cookies.token);
   const file_id = req.body.fileid;
   const newEntityName = req.body.newName;
-  const parent = req.body.currentFolder || null;
-
+  const parent = req.body.folderId || null;
+  console.log(req.params.id);
   try {
     await files.renameEntity(file_id, newEntityName);
     if (parent === null) {
@@ -351,17 +367,37 @@ router.get("/properties", jwt.authenticate, async (req, res) => {
     const fileDetails = await files.getEntityDetailsById(entityId);
     const size = bytes(fileDetails[0].size);
     const owner = await users.getUserDetailsById(fileDetails[0].file_owner);
-    const date = format(new Date(fileDetails[0].upload_date), "dd MMMM yyyy");
+    const uploadDate = format(
+      new Date(fileDetails[0].upload_date),
+      "dd MMMM yyyy"
+    );
+    const modifiedDate = format(
+      new Date(fileDetails[0].modified_date),
+      "dd MMMM yyyy"
+    );
     res.render("parts/propertiesDetails", {
       fileDetails,
       size,
-      date,
+      uploadDate,
+      modifiedDate,
       owner: owner.username,
       ownerEmail: owner.email,
     });
   } catch (err) {
     console.error(err);
     res.status(500).send();
+  }
+});
+
+router.post("/editPButton", async (req, res) => {
+  const userId = req.body.userId;
+  const entityId = req.body.entityid;
+  const permissionData = await users.getUserPermission(userId, entityId);
+
+  try {
+    res.render("parts/editPermission", { user: permissionData });
+  } catch (error) {
+    throw error;
   }
 });
 

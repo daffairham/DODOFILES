@@ -7,21 +7,19 @@
       <span class="text-[#A2A6AD]">
         <%= user.email %>
       </span>
-      
-      <button class="text-red-600 hover:text-red-800" 
-      hx-post="/removeAccess" 
-      hx-vals='{"userId": "<%= user.user_id %>"}'
-      hx-target="#users<%= index %>" hx-swap="outerHTML swap:0.5s"
-      hx-confirm="Are you sure you want to remove access for this user?">
+      <div id="permission" class="md:flex md:flex-row">
+        <% if (user.permission==='r' ) { %>
+          <span>Permission: <span class="text-green-500">Read</span></span>
+          <% } else { %>
+            <span>Permission: <span class="text-blue-500">Write</span></span>
+            <% } %>
+      </div>
+      <button class="mr-4 text-red-600 hover:text-red-800" hx-post="/removeAccess"
+        hx-vals='{"userId": "<%= user.user_id %>"}' hx-target="#users<%= index %>" hx-swap="outerHTML swap:0.5s"
+        hx-confirm="Are you sure you want to remove access for this user?">
         Remove Access
-    </button>
+      </button>
     </div>
-    <div class="relative">
-      <select
-        class="hover:border-[#0CC0DF] hover:cursor-pointer hover:bg-slate-300 border-2 p-1 rounded-md text-gray-700">
-        <option value="view" <%=user.permission==='r' ? 'selected' : '' %>>View</option>
-        <option value="edit" <%=user.permission==='rw' ? 'selected' : '' %>>Edit</option>
-      </select>
-    </div>
+    <button class="text-white border-2 border-green-500 p-2 rounded-md bg-green-500 hover:border-green-600 hover:bg-green-600" hx-post="/editPButton" hx-target="#users<%= index %>" hx-vals='{"userId": "<%= user.user_id %>"}'>Edit Permission</button>
   </div>
   <% }) %>

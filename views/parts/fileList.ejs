@@ -67,7 +67,7 @@
                           class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Share
                         </button>
                         <button onclick="event.stopPropagation(); openPropertiesModal(<%= index %>)"
-                          hx-get="/properties" hx-target="#entity-details<%= index %>" hx-vals='{"fileid": "<%= file.file_id %>"}'
+                          hx-get="/properties" hx-boost="false" hx-push-url="false" hx-target="#entity-details<%= index %>" hx-vals='{"fileid": "<%= file.file_id %>"}'
                           class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Properties
                         </button>
                   </div>

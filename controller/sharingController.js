@@ -19,7 +19,6 @@ router.post("/share", jwt.authenticate, async (req, res) => {
       userId,
       entityId
     );
-
     if (permissionExist.rows > 0) {
       res.send("User already has access to this file/folder");
       return;
@@ -54,15 +53,15 @@ router.post("/removeAccess", jwt.authenticate, async (req, res) => {
     const isFolder = entityTipe.is_folder;
     console.log(isFolder);
     if (isFolder) {
-      await sharing.removeSharedAccess(userId, entityName); 
+      await sharing.removeSharedAccess(userId, entityName);
       const childrenEntity = await files.getChildFromParent(entityId);
       for (const file_id of childrenEntity) {
-        const id = await files.getEntityNameById(file_id.file_id)
+        const id = await files.getEntityNameById(file_id.file_id);
         const childrenName = id.file_name;
         await sharing.removeSharedAccess(userId, childrenName); //kasih akses untuk entity dlm folder
       }
     } else {
-      const id = await files.getEntityIdByName(entityName)
+      const id = await files.getEntityIdByName(entityName);
       await sharing.removeSharedAccess(userId, id.file_id);
     }
     sharing.removeSharedAccess(userId, entityName);
@@ -97,21 +96,21 @@ router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
   const userId = jwt.getIdFromToken(req.cookies.token);
   const entityName = req.query.filename;
   const getId = await files.getEntityIdByName(entityName);
-  const entityId = getId.file_id
+  const entityId = getId.file_id;
   try {
     const entityTipe = await files.checkEntityType(entityId);
     const isFolder = entityTipe.is_folder;
     console.log(isFolder);
     if (isFolder) {
-      await sharing.removeSharedAccess(userId, entityName); 
+      await sharing.removeSharedAccess(userId, entityName);
       const childrenEntity = await files.getChildFromParent(entityId);
       for (const file_id of childrenEntity) {
-        const id = await files.getEntityNameById(file_id.file_id)
+        const id = await files.getEntityNameById(file_id.file_id);
         const childrenName = id.file_name;
         await sharing.removeSharedAccess(userId, childrenName); //kasih akses untuk entity dlm folder
       }
     } else {
-      const id = await files.getEntityIdByName(entityName)
+      const id = await files.getEntityIdByName(entityName);
       await sharing.removeSharedAccess(userId, id.file_id);
     }
     sharing.removeSharedAccess(userId, entityName);
@@ -159,47 +158,37 @@ router.get("/sharedFolder/:folderId", jwt.authenticate, async (req, res) => {
       folderId,
       folderList,
       entityAmt: fileList.length,
+      folderName,
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");
   }
 });
 
-router.post("/testingShare", jwt.authenticate, async (req, res) => {
-  const userData = req.user;
-  const userId = jwt.getIdFromToken(req.cookies.token);
-  const targetEmail = req.body.email;
+router.post("/changePermission", jwt.authenticate, async (req, res) => {
+  const userId = req.body.userId;
   const entityId = req.body.entityid;
-  let permission = req.body.permission === "1" ? "rw" : "r";
-  const parent = req.body.currentFolder || null;
+  const changedPermission = req.body.userpermission;
   try {
-    const entityTipe = await sharing.testingShare(entityId);
-    const isFolder = entityTipe.is_folder;
-    const userId = await sharing.getUserIdToShare(targetEmail);
-
-    const permissionExist = await sharing.checkPermissionExist(
-      userId,
-      entityId
-    );
-
-    if (permissionExist.rows > 0) {
-      res.send("User already has access to this file/folder");
-      return;
-    }
-    if (isFolder) {
-      await sharing.grantPermission(userId, entityId, permission);
-      const childrenEntity = await files.getChildFromParent(entityId);
-      for (const file_id of childrenEntity) {
-        await sharing.grantPermission(userId, file_id.file_id, permission);
-      }
+    let permissionType = "";
+    if (changedPermission === "view") {
+      permissionType = 'r'
+    } else if (changedPermission === "edit") {
+      permissionType = 'rw'
     } else {
-      await sharing.grantPermission(userId, entityId, permission);
+      res.status(500).send("error");
+    }
+    const result = await sharing.changePermission(permissionType, userId, entityId);
+    const childEntities = await files.getChildFromParent(result.file_id);
+    if(childEntities.length > 0){
+      for (let i = 0; i < childEntities.length; i++) {
+        const childEntity = parent[i].file_id;
+        await sharing.changePermission(permissionType, userId, childEntity);
+      }   
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
   }
 });
 
