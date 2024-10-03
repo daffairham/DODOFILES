@@ -389,7 +389,7 @@ router.get("/properties", jwt.authenticate, async (req, res) => {
   }
 });
 
-router.post("/editPButton", async (req, res) => {
+router.post("/editPButton", jwt.authenticate, async (req, res) => {
   const userId = req.body.userId;
   const entityId = req.body.entityid;
   const permissionData = await users.getUserPermission(userId, entityId);

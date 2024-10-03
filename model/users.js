@@ -3,11 +3,10 @@ const db = require("../config/db.js");
 // AMBIL DATA USER
 const getUser = async (username) => {
   try {
-    const QUERY = `SELECT * FROM users WHERE username = $1`;
-    const { rows } = await db.query(QUERY, [username]);
-    return rows[0];
+    const query = `SELECT * FROM users WHERE username = $1`;
+    const result = await db.query(query, [username]);
+    return result.rows[0];
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
@@ -15,10 +14,9 @@ const getUser = async (username) => {
 // FUNGSI UNTUK MENAMBAHKAN USER. DIPAKAI UNTUK REGISTRASI
 const addUser = async (email, username, hashedPassword) => {
   try {
-    const QUERY = `INSERT INTO users(email, username, password) VALUES ($1, $2, $3)`;
-    await db.query(QUERY, [email, username, hashedPassword]);
+    const query = `INSERT INTO users(email, username, password) VALUES ($1, $2, $3)`;
+    await db.query(query, [email, username, hashedPassword]);
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
@@ -26,22 +24,31 @@ const addUser = async (email, username, hashedPassword) => {
 // FUNGSI UNTUK MEMERIKSA APAKAH USERNAME SUDAH TERDAFTAR. DIPAKAI SAAT REGISTRASI
 const checkUserExist = async (username) => {
   try {
-    const QUERY = `SELECT username FROM users WHERE username = $1`;
-    const { rows } = await db.query(QUERY, [username]);
-    return rows[0];
+    const query = `SELECT username FROM users WHERE username = $1`;
+    const result = await db.query(query, [username]);
+    return result.rows;
   } catch (error) {
-    console.error("Error:", error);
+    throw error;
+  }
+};
+
+// FUNGSI UNTUK MEMERIKSA APAKAH EMAIL SUDAH TERDAFTAR. DIPAKAI SAAT REGISTRASI
+const checkEmailExist = async (email) => {
+  try {
+    const query = `SELECT email FROM users WHERE email = $1`;
+    const result= await db.query(query, [email]);
+    return result.rows;
+  } catch (error) {
     throw error;
   }
 };
 
 const getUserDetailsById = async (userId) => {
   try {
-    const QUERY = `SELECT username, email FROM users WHERE user_id = $1`;
-    const { rows } = await db.query(QUERY, [userId]);
-    return rows[0];
+    const query = `SELECT username, email FROM users WHERE user_id = $1`;
+    const result = await db.query(query, [userId]);
+    return result.rows[0];
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
@@ -60,4 +67,4 @@ const getUserPermission = async (userId, entityId) => {
   }
 };
 
-module.exports = { getUser, addUser, checkUserExist, getUserDetailsById, getUserPermission };
+module.exports = { getUser, addUser, checkUserExist, checkEmailExist, getUserDetailsById, getUserPermission };

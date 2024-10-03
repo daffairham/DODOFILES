@@ -9,12 +9,13 @@ router.get("/", jwt.authenticate, (req, res) => {
   res.render("login");
 });
 
-router.get("/sign-in", (req, res) => {
+router.get("/sign-in", jwt.authenticate, (req, res) => {
   res.redirect("/");
 });
 
 router.post("/sign-in", async (req, res) => {
   const { username, password } = req.body;
+  let serverMessage = '';
   try {
     const userData = await users.getUser(username);
     if (userData) {
@@ -32,8 +33,9 @@ router.post("/sign-in", async (req, res) => {
         res.redirect("/");
       }
     } else {
-      console.log("Account not registered");
-      res.redirect("/");
+      res.send(`<span class="text-red-500">Account not registered</span>`)
+      // serverMessage = "Account not registered.";
+      // res.render("login", {serverMessage});
     }
   } catch (error) {
     console.error("Error:", error);
