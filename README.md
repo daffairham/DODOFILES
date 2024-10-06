@@ -23,7 +23,7 @@ Fitur-fitur yang tersedia di aplikasi ini adalah sebagai berikut:
  - Membagikan file
 
 # Acknowledgements
-Saya ingin mengucapkan terima kasih banyak kepada keluarga Saya terutama ibu Saya yang sudah memberikan semangat dan juga do'a selama pengerjaan TA, teman-teman Saya yang selalu memberikan saya dukungan dan juga semangat kepada saya, dan dosen pembimbing Saya, Pak Keenan yang sudah membantu Saya selama dua semester ini dalam pengerjaan Tugas Akhir Saya dengan memberikan saran, *feedback* yang dibutuhkan. 
+Saya ingin mengucapkan terima kasih banyak kepada keluarga Saya terutama ibu Saya yang sudah memberikan semangat, dukungan, dan juga do'a selama pengerjaan TA, teman-teman Saya yang selalu memberikan saya dukungan dan juga semangat kepada saya, dan dosen pembimbing Saya, Pak Keenan yang sudah membantu Saya selama dua semester ini dalam pengerjaan Tugas Akhir Saya dengan memberikan saran, *feedback* yang dibutuhkan. 
 
 # Afterwords
 Aplikasi yang dikembangkan mungkin saja belum optimal di segi performa aplikasi, kerapihan kode yang ditulis, dan juga efisiensi dari fungsi yang Saya buat. Aplikasi ini Saya buat secara sepenuh hati, dan Saya juga sangat senang dalam proses pengembangan karena selama proses Saya mempelajari banyak hal yang Saya tidak ketahui sebelumnya.
