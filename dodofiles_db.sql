@@ -140,21 +140,21 @@ COPY public.users (user_id, email, username, password) FROM stdin;
 -- Name: files_file_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.files_file_id_seq', 278, true);
+SELECT pg_catalog.setval('public.files_file_id_seq', 316, true);
 
 
 --
 -- Name: shared_files_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.shared_files_id_seq', 6, true);
+SELECT pg_catalog.setval('public.shared_files_id_seq', 12, true);
 
 
 --
 -- Name: users_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.users_user_id_seq', 13, true);
+SELECT pg_catalog.setval('public.users_user_id_seq', 39, true);
 
 
 --
@@ -197,19 +197,19 @@ ALTER TABLE ONLY public.filesystem_entity
 
 
 --
--- Name: filesystem_entity selfref_parentid_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: filesystem_entity filesystem_entity_parent_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.filesystem_entity
-    ADD CONSTRAINT selfref_parentid_fk FOREIGN KEY (parent) REFERENCES public.filesystem_entity(file_id) NOT VALID;
+    ADD CONSTRAINT filesystem_entity_parent_fkey FOREIGN KEY (parent) REFERENCES public.filesystem_entity(file_id) ON DELETE CASCADE NOT VALID;
 
 
 --
--- Name: shared_files sharedfiles_fileid_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: shared_files shared_files_file_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY public.shared_files
-    ADD CONSTRAINT sharedfiles_fileid_fk FOREIGN KEY (file_id) REFERENCES public.filesystem_entity(file_id);
+    ADD CONSTRAINT shared_files_file_id_fkey FOREIGN KEY (file_id) REFERENCES public.filesystem_entity(file_id) ON DELETE CASCADE NOT VALID;
 
 
 --
