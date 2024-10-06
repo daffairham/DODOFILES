@@ -1,6 +1,7 @@
 
 # DODOFILES
 DODOFILES adalah sebuah aplikasi manajemen file sederhana berbasis web. Aplikasi ini Saya (Daffa Irham Atharazka) kembangkan sebagai Tugas Akhir Saya. Aplikasi ini memiliki fitur-fitur yang umum pada aplikasi manajemen file yang sering dipakai seperti contohnya *upload file*, mengunduh file, menghapus file, membagikan file, dan sebagainya. 
+
 Permasalahan yang ingin diselesaikan adalah **membuat aplikasi manajemen file seperti Google Drive, Dropbox, dan semacamnya akan tetapi, aplikasi-aplikasi tersebut membutuhkan jaringan internet untuk diakses yang dimana kita tidak selalu memiliki jaringan internet setiap saat. Aplikasi ini dibuat untuk berjalan di dalam jaringan ***intranet***.
 
 
