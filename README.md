@@ -7,6 +7,7 @@ Teknologi yang digunakan dalam pengembangan aplikasi ini adalah sebagai berikut:
 
  - Node.js
  - Express
+ - EJS (Embedded JavaScript)
  - HTMX
  - PostGreSQL
 
