@@ -56,7 +56,7 @@ const uploadFile = async (file, parent, fileOwner) => {
       entityLink,
       modifiedDate
     );
-    if(parent!=null){
+    if (parent != null) {
       await updateModifiedDateRec(parent);
     }
     return uploadedFile;
@@ -194,6 +194,9 @@ const moveFile = async (userId, filename, parent) => {
   const query = `UPDATE filesystem_entity SET parent = $1 WHERE file_name = $2 AND file_owner = $3`;
   try {
     await db.query(query, [parent, filename, userId]);
+    if (parent != null) {
+      await updateModifiedDateRec(parent);
+    }
   } catch (error) {
     console.error("Error moving file:", error);
     throw error;
@@ -204,7 +207,7 @@ const copyFile = async (
   fileName,
   uploadDate,
   fileSize,
-  parentID,
+  parent,
   fileOwner,
   isFolder,
   sourceUniqueName,
@@ -220,7 +223,7 @@ const copyFile = async (
       fileName,
       uploadDate,
       fileSize,
-      parentID || null,
+      parent || null,
       fileOwner,
       isFolder,
       uniqueName,
@@ -231,9 +234,10 @@ const copyFile = async (
     const destinationPath = path.join(__dirname, "../files", uniqueName);
 
     await fs.copyFile(sourcePath, destinationPath);
-    console.log("File copied successfully");
+    if (parent != null) {
+      await updateModifiedDateRec(parent);
+    }
   } catch (error) {
-    console.error("Error copying file:", error);
     throw error;
   }
 };
@@ -245,10 +249,9 @@ const createFolder = async (
   fileOwner,
   modifiedDate
 ) => {
-  const uniqueFilename = uuidv4();
   const entityLink = uuidv4();
   const query = `INSERT INTO filesystem_entity(file_name, upload_date, size, parent, deleted_date, file_owner, is_folder, unique_filename, entity_link, modified_date)
-                    VALUES ($1, $2, 0, $3, NULL, $4, TRUE, $5, $6, $7)
+                    VALUES ($1, $2, 0, $3, NULL, $4, TRUE, NULL, $5, $6)
                     RETURNING file_id`;
   try {
     const result = await db.query(query, [
@@ -256,11 +259,10 @@ const createFolder = async (
       uploadDate,
       parent,
       fileOwner,
-      uniqueFilename,
       entityLink,
       modifiedDate,
     ]);
-    if(parent!=null){
+    if (parent != null) {
       await updateModifiedDateRec(parent);
     }
     return result.rows[0];
@@ -271,10 +273,16 @@ const createFolder = async (
 };
 
 const renameEntity = async (fileId, newEntityName) => {
-  const renameQuery = `UPDATE filesystem_entity SET file_name = $1, modified_date = $2 WHERE file_id = $3`;
+  const renameQuery = `UPDATE filesystem_entity SET file_name = $1, modified_date = $2 WHERE file_id = $3
+                      RETURNING parent`;
   try {
-    await db.query(renameQuery, [newEntityName, new Date(), fileId]);
+    const result = await db.query(renameQuery, [
+      newEntityName,
+      new Date(),
+      fileId,
+    ]);
     await updateModifiedDateRec(fileId);
+    return result.rows[0];
   } catch (error) {
     throw error;
   }
@@ -382,10 +390,44 @@ const updateModifiedDateRec = async (entityId) => {
 
   try {
     const result = await db.query(query, [entityId]);
-    const folderIds = result.rows.map(row => row.file_id);
+    const folderIds = result.rows.map((row) => row.file_id);
 
     for (const folderId of folderIds) {
       await updateModifiedDate(folderId);
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const deleteEntity = async (entityId) => {
+  const query = `WITH RECURSIVE children_entity AS (
+                    SELECT file_id, unique_filename
+                    FROM filesystem_entity
+                    WHERE file_id = $1
+
+                    UNION
+
+                    SELECT filesystem_entity.file_id, filesystem_entity.unique_filename
+                    FROM filesystem_entity
+                    INNER JOIN children_entity ON filesystem_entity.parent = children_entity.file_id
+                  )
+                  DELETE FROM filesystem_entity
+                  WHERE file_id IN (SELECT file_id FROM children_entity)
+                  RETURNING unique_filename;`;
+
+  try {
+    const result = await db.query(query, [entityId]);
+    for (const row of result.rows) {
+      if (row.unique_filename !== null) {
+        try {
+          await fs.unlink(
+            path.join(__dirname, "../files", row.unique_filename)
+          );
+        } catch (err) {
+          throw err;
+        }
+      }
     }
   } catch (error) {
     throw error;
@@ -413,5 +455,6 @@ module.exports = {
   getChildFromParent,
   checkEntityType,
   updateModifiedDate,
-  updateModifiedDateRec
+  updateModifiedDateRec,
+  deleteEntity,
 };

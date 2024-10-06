@@ -29,11 +29,10 @@ router.post("/sign-in", async (req, res) => {
         });
         res.redirect("/home");
       } else {
-        console.log("Invalid password");
-        res.redirect("/");
+        res.render("login", {serverMessage: "Password is incorrect."})
       }
     } else {
-      res.send(`<span class="text-red-500">Account not registered</span>`)
+      res.render("login", {serverMessage: "Account is not registered."})
       // serverMessage = "Account not registered.";
       // res.render("login", {serverMessage});
     }

@@ -20,7 +20,6 @@ router.post("/upload", jwt.authenticate, async (req, res) => {
     const uploadedFile = await files.uploadFile(file, parent, userId);
 
     if (parent !== null) {
-      console.log(uploadedFile);
       await sharing.handleNewUpload(uploadedFile.file_id, parent, userId);
     }
 
@@ -99,7 +98,6 @@ router.post("/uploadFolder", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = jwt.getIdFromToken(req.cookies.token);
   const parent = req.body.folderId || null;
-  console.log(req.files);
   try {
     for (const file of filesUploaded) {
       await files.uploadFile(file, parent, userId);
@@ -204,7 +202,6 @@ router.get("/getFolderList", jwt.authenticate, async (req, res) => {
   const userId = req.user.user_id;
   try {
     const result = await files.getUserFolder(userId);
-    console.log(result);
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");
@@ -224,7 +221,6 @@ router.post("/moveFile", jwt.authenticate, async (req, res) => {
     if (Number(parent) === parentDestination) {
       res.status(200).send();
     } else {
-      console.log("File moved successfully.", parent, parentDestination);
       res.status(200).send();
     }
   } catch (err) {
@@ -283,7 +279,6 @@ router.post("/createFolder", jwt.authenticate, async (req, res) => {
       new Date()
     );
 
-    console.log("cf", newFolder.file_id, parent, userId);
     if (parent !== null) {
       await sharing.handleNewUpload(newFolder.file_id, parent, userId);
     }
@@ -303,10 +298,9 @@ router.post("/rename", jwt.authenticate, async (req, res) => {
   const userId = jwt.getIdFromToken(req.cookies.token);
   const file_id = req.body.fileid;
   const newEntityName = req.body.newName;
-  const parent = req.body.folderId || null;
-  console.log(req.params.id);
   try {
-    await files.renameEntity(file_id, newEntityName);
+    const rename = await files.renameEntity(file_id, newEntityName);
+    const parent = rename.parent;
     if (parent === null) {
       const fileList = await files.getFilesInRoot(userId);
       const folderList = await files.getUserFolder(userId);
@@ -396,6 +390,18 @@ router.post("/editPButton", jwt.authenticate, async (req, res) => {
 
   try {
     res.render("parts/editPermission", { user: permissionData });
+  } catch (error) {
+    throw error;
+  }
+});
+
+router.post("/deleteFromSystem", jwt.authenticate, async (req, res) => {
+  const filename = req.query.filename;
+  const getEntityId = await files.getEntityIdByName(filename);
+  const fileId = getEntityId.file_id;
+  try {
+    await files.deleteEntity(fileId);
+    res.status(200).send();
   } catch (error) {
     throw error;
   }

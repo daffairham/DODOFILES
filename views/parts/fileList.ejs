@@ -59,6 +59,7 @@
                         </button>
                         <button onclick="event.stopPropagation();" hx-post="/delete?filename=<%= file.file_name %>"
                           hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s"
+                          hx-boost="false" hx-push-url="false"
                           class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move to recycle bin
                         </button>
                         <button onclick="event.stopPropagation(); openShareFileModal(<%= index %>)"
