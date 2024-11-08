@@ -215,7 +215,7 @@ router.post("/moveFile", jwt.authenticate, async (req, res) => {
 
   try {
     await files.moveFile(userId, filename, parent);
-    const result = await files.getEntityIdByName(userId, filename);
+    const result = files.getEntityIdByName(userId, filename);
     const parentDestination = result.file_id;
 
     if (Number(parent) === parentDestination) {
@@ -254,7 +254,7 @@ router.post("/copyFile", jwt.authenticate, async (req, res) => {
     const parentDestination = result.file_id;
 
     if (Number(parent) === parentDestination) {
-      res.status(200).send("File copied successfully.");
+      res.status(200).send();
     } else {
       res.status(200).send();
     }

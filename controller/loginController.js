@@ -6,7 +6,7 @@ const jwt = require("../config/jwt.js");
 const users = require("../model/users.js");
 
 router.get("/", jwt.authenticate, (req, res) => {
-  res.render("login");
+  res.render("login", { serverMessage: "" });
 });
 
 router.get("/sign-in", jwt.authenticate, (req, res) => {
@@ -15,7 +15,6 @@ router.get("/sign-in", jwt.authenticate, (req, res) => {
 
 router.post("/sign-in", async (req, res) => {
   const { username, password } = req.body;
-  let serverMessage = '';
   try {
     const userData = await users.getUser(username);
     if (userData) {
@@ -29,10 +28,10 @@ router.post("/sign-in", async (req, res) => {
         });
         res.redirect("/home");
       } else {
-        res.render("login", {serverMessage: "Password is incorrect."})
+        res.render("login", { serverMessage: "Password is incorrect." });
       }
     } else {
-      res.render("login", {serverMessage: "Account is not registered."})
+      res.render("login", { serverMessage: "Account is not registered." });
       // serverMessage = "Account not registered.";
       // res.render("login", {serverMessage});
     }

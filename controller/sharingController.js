@@ -9,7 +9,7 @@ const files = require("../model/files.js");
 router.post("/share", jwt.authenticate, async (req, res) => {
   const targetEmail = req.body.email;
   const entityId = req.body.entityid;
-  let permission = req.body.permission === "1" ? "rw" : "r";
+  let permission = "r";
 
   try {
     const entityTipe = await files.checkEntityType(entityId);
@@ -173,19 +173,23 @@ router.post("/changePermission", jwt.authenticate, async (req, res) => {
   try {
     let permissionType = "";
     if (changedPermission === "view") {
-      permissionType = 'r'
+      permissionType = "r";
     } else if (changedPermission === "edit") {
-      permissionType = 'rw'
+      permissionType = "rw";
     } else {
       res.status(500).send("error");
     }
-    const result = await sharing.changePermission(permissionType, userId, entityId);
+    const result = await sharing.changePermission(
+      permissionType,
+      userId,
+      entityId
+    );
     const childEntities = await files.getChildFromParent(result.file_id);
-    if(childEntities.length > 0){
+    if (childEntities.length > 0) {
       for (let i = 0; i < childEntities.length; i++) {
         const childEntity = parent[i].file_id;
         await sharing.changePermission(permissionType, userId, childEntity);
-      }   
+      }
     }
   } catch (err) {
     console.error(err);

@@ -198,7 +198,6 @@ const moveFile = async (userId, filename, parent) => {
       await updateModifiedDateRec(parent);
     }
   } catch (error) {
-    console.error("Error moving file:", error);
     throw error;
   }
 };
