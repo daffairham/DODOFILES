@@ -63,3 +63,35 @@ function restoreToast() {
     backgroundColor: "#0CC0DF",
   }).showToast();
 }
+
+function sharingToast(xhr) {
+  let message, bgColor;
+
+  if (xhr.status === 404) {
+    message = "The user is not registered.";
+    bgColor = "#FF4D4D";
+  } else if (xhr.status === 409) {
+    const response = JSON.parse(xhr.responseText);
+    if (response.message === "1") {
+      message = "You can't share files with yourself!";
+      bgColor = "#FF4D4D";
+    } else if (response.message === "2") {
+      message = "User already have access to this file.";
+      bgColor = "#0CC0DF";
+    }
+  } else if (xhr.status === 200) {
+    message = "File shared successfully.";
+    bgColor = "#0CC0DF";
+  } else {
+    message = "An error occurred, please try again.";
+    bgColor = "#808080";
+  }
+  Toastify({
+    text: message,
+    duration: 3000,
+    close: true,
+    backgroundColor: bgColor,
+    gravity: "bottom",
+    position: "center",
+  }).showToast();
+}

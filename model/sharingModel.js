@@ -106,8 +106,7 @@ const grantPermission = async (userId, folderId, permission) => {
       `;
       await db.query(insertQuery, [userId, entityId, permission]);
     }
-
-    return { success: true };
+    return;
   } catch (err) {
     throw err;
   }
@@ -250,5 +249,5 @@ module.exports = {
   handleNewUpload,
   fileModel,
   getChildFromParent,
-  changePermission
+  changePermission,
 };

@@ -7,10 +7,11 @@ const jwt = require("../config/jwt.js");
 const files = require("../model/files.js");
 
 router.post("/share", jwt.authenticate, async (req, res) => {
+  const userData = req.user;
   const targetEmail = req.body.email;
   const entityId = req.body.entityid;
   let permission = "r";
-
+  const currentUserEmail = userData.email;
   try {
     const entityTipe = await files.checkEntityType(entityId);
     const isFolder = entityTipe.is_folder;
@@ -18,28 +19,36 @@ router.post("/share", jwt.authenticate, async (req, res) => {
     const permissionExist = await sharing.checkPermissionExist(
       userId,
       entityId
-    );
-    if (permissionExist.rows > 0) {
-      res.send("User already has access to this file/folder");
-      return;
+    ); // untuk meriksa apakah user target sudah memiliki akses terhadap file yg ingin dibagikan
+
+    /* periksa apakah email yang dimasukkan sama dengan email login dari pengguna.
+    kondisi dibuat untuk mencegah pengguna membagikan sebuah file ke dirinya sendiri. */
+    if (currentUserEmail === targetEmail) {
+      return res.status(409).json({ message: "1" });
+    }
+    /* periksa apakah user tujuan terdaftar dalam database. */
+    if (!userId) {
+      return res.status(404).send("User not registered");
+    }
+    /* periksa apakah user sudah memiliki akses terhadap file yang ingin dibagikan */
+    if (permissionExist.length > 0) {
+      return res.status(409).json({ message: "2" });
     }
 
+    /* jika yang dibagikan adalah sebuah folder, ambil semua entitas dalam folder tersebut lalu lakukan looping untuk memasukan
+    entitas yang ada dalam folder tersebut */
     if (isFolder) {
-      await sharing.grantPermission(userId, entityId, permission); //kasih akses untuk folder
+      await sharing.grantPermission(userId, entityId, permission);
       const childrenEntity = await files.getChildFromParent(entityId);
       for (const file_id of childrenEntity) {
-        await sharing.grantPermission(userId, file_id.file_id, permission); //kasih akses untuk entity dlm folder
+        await sharing.grantPermission(userId, file_id.file_id, permission);
       }
     } else {
       await sharing.grantPermission(userId, entityId, permission);
     }
-
-    await sharing.grantPermission(userId, entityId, permission);
-    console.log("File shared.");
-    res.redirect(req.originalUrl);
+    res.send("");
   } catch (err) {
     console.error(err);
-    res.status(500).send("An error occurred while sharing the file/folder.");
   }
 });
 
