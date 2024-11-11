@@ -83,7 +83,6 @@ const getFilesInRoot = async (userId) => {
     const result = await db.query(query, [userId]);
     return result.rows;
   } catch (error) {
-    console.error("Error retrieving files in root:", error);
     throw error;
   }
 };
@@ -94,7 +93,6 @@ const getUserFolder = async (userId) => {
     const result = await db.query(query, [userId]);
     return result.rows;
   } catch (error) {
-    console.error("Error retrieving user folders:", error);
     throw error;
   }
 };
@@ -105,7 +103,6 @@ const getFolderName = async (userId, folderId) => {
     const result = await db.query(query, [folderId, userId]);
     return result;
   } catch (error) {
-    console.error("Error retrieving folder name:", error);
     throw error;
   }
 };

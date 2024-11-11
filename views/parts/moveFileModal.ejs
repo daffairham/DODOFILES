@@ -4,6 +4,7 @@
     <div class="flex justify-between items-center mb-4">
       <span class="text-center text-[#0CC0DF]">Move <span class="font-bold">
           <%= file.file_name %>
+
         </span></span>
       <button class="text-2xl" onclick="closeMoveFileModal(<%= index %>)">&times;</button>
     </div>
@@ -15,10 +16,12 @@
         <option value="" selected disabled hidden>Choose a folder...</option>
         <option value="null">Main directory</option>
         <% for( const row of folderList ) { %>
-          <option value="<%= row.file_id %>">
-            <%= row.file_name %>
-          </option>
-          <% } %>
+          <% if (row.file_id !==file.file_id) { %>
+            <option value="<%= row.file_id %>">
+              <%= row.file_name %>
+            </option>
+            <% } %>
+              <% } %>
       </select>
       <div class="md:flex items-center justify-center">
         <input type="submit" value="Move"
