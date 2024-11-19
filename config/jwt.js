@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
-const secretKey = "inikunci";
+const secretKey = process.env.JWT_KEY;
 
 //FUNGSI UNTUK MEMBUAT TOKEN JWT
 const generateToken = (payload) => {
@@ -12,9 +12,9 @@ const verifyToken = (token) => {
   return jwt.verify(token, secretKey);
 };
 
-const getIdFromToken = (token) =>{
+const getIdFromToken = (token) => {
   return verifyToken(token).user_id;
-}
+};
 
 const authenticate = async (req, res, next) => {
   const token = req.cookies.token;
@@ -34,4 +34,4 @@ const authenticate = async (req, res, next) => {
   }
 };
 
-module.exports = {generateToken, verifyToken, authenticate, getIdFromToken};
+module.exports = { generateToken, verifyToken, authenticate, getIdFromToken };

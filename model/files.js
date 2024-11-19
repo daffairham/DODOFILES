@@ -156,10 +156,10 @@ const downloadFile = async (filename, userId, res) => {
   }
 };
 
-const moveToBin = async (filename, userId) => {
-  const query = `UPDATE filesystem_entity SET deleted_date = $1 WHERE file_name = $2 AND file_owner = $3`;
+const moveToBin = async (fileId, userId) => {
+  const query = `UPDATE filesystem_entity SET deleted_date = $1 WHERE file_id = $2 AND file_owner = $3`;
   try {
-    await db.query(query, [new Date(), filename, userId]);
+    await db.query(query, [new Date(), fileId, userId]);
   } catch (error) {
     console.error("Error moving file to bin:", error);
     throw error;
@@ -177,10 +177,10 @@ const getDeletedFiles = async (userId) => {
   }
 };
 
-const restoreFromBin = async (filename, userId) => {
-  const query = `UPDATE filesystem_entity SET deleted_date = NULL WHERE file_name = $1 AND file_owner = $2`;
+const restoreFromBin = async (fileId, userId) => {
+  const query = `UPDATE filesystem_entity SET deleted_date = NULL WHERE file_id = $1 AND file_owner = $2`;
   try {
-    await db.query(query, [filename, userId]);
+    await db.query(query, [fileId, userId]);
   } catch (error) {
     console.error("Error restoring file from bin:", error);
     throw error;
@@ -396,33 +396,45 @@ const updateModifiedDateRec = async (entityId) => {
   }
 };
 
-const deleteEntity = async (entityId) => {
-  const query = `WITH RECURSIVE children_entity AS (
-                    SELECT file_id, unique_filename
-                    FROM filesystem_entity
-                    WHERE file_id = $1
-
-                    UNION
-
-                    SELECT filesystem_entity.file_id, filesystem_entity.unique_filename
-                    FROM filesystem_entity
-                    INNER JOIN children_entity ON filesystem_entity.parent = children_entity.file_id
-                  )
-                  DELETE FROM filesystem_entity
-                  WHERE file_id IN (SELECT file_id FROM children_entity)
-                  RETURNING unique_filename;`;
-
+const deleteEntity = async (isFolder, entityId, owner) => {
   try {
-    const result = await db.query(query, [entityId]);
-    for (const row of result.rows) {
-      if (row.unique_filename !== null) {
-        try {
-          await fs.unlink(
-            path.join(__dirname, "../files", row.unique_filename)
-          );
-        } catch (err) {
-          throw err;
+    if (isFolder) {
+      const query = `WITH RECURSIVE children_entity AS (
+        SELECT file_id, unique_filename
+        FROM filesystem_entity
+        WHERE file_id = $1 AND file_owner = $2
+
+        UNION
+
+        SELECT filesystem_entity.file_id, filesystem_entity.unique_filename
+        FROM filesystem_entity
+        INNER JOIN children_entity ON filesystem_entity.parent = children_entity.file_id
+      )
+      DELETE FROM filesystem_entity
+      WHERE file_id IN (SELECT file_id FROM children_entity)
+      RETURNING unique_filename`;
+      const result = await db.query(query, [entityId, owner]);
+      for (const row of result.rows) {
+        if (row.unique_filename !== null) {
+          try {
+            await fs.unlink(
+              path.join(__dirname, "../files", row.unique_filename)
+            );
+          } catch (err) {
+            throw err;
+          }
         }
+      }
+    } else {
+      const query = `DELETE FROM filesystem_entity
+      WHERE file_id = $1 AND file_owner = $2
+      RETURNING unique_filename`;
+      const result = await db.query(query, [entityId, owner]);
+      const deletedFileName = result.rows[0].unique_filename;
+      try {
+        await fs.unlink(path.join(__dirname, "../files", deletedFileName));
+      } catch (err) {
+        throw err;
       }
     }
   } catch (error) {

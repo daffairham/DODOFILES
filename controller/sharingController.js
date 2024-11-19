@@ -46,7 +46,7 @@ router.post("/share", jwt.authenticate, async (req, res) => {
     } else {
       await sharing.grantPermission(userId, entityId, permission);
     }
-    res.send("");
+    res.status(200).json({ message: "S" });
   } catch (err) {
     console.error(err);
   }
@@ -196,10 +196,12 @@ router.post("/changePermission", jwt.authenticate, async (req, res) => {
     const childEntities = await files.getChildFromParent(result.file_id);
     if (childEntities.length > 0) {
       for (let i = 0; i < childEntities.length; i++) {
-        const childEntity = parent[i].file_id;
+        const childEntity = childEntities[i].file_id;
         await sharing.changePermission(permissionType, userId, childEntity);
       }
     }
+    const sharedUserLists = await sharing.getSharedUsers(entityId);
+    res.render("parts/sharedUsers", { sharedUserLists });
   } catch (err) {
     console.error(err);
   }

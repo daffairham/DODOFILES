@@ -154,9 +154,11 @@ router.get("/downloadFolder/:folderId", jwt.authenticate, async (req, res) => {
 
 router.post("/delete", jwt.authenticate, async (req, res) => {
   const fileName = req.query.filename;
+  const fileIdFromDB = await files.getEntityIdByName(fileName);
+  const fileId = await fileIdFromDB.file_id;
   const userId = jwt.getIdFromToken(req.cookies.token);
   try {
-    await files.moveToBin(fileName, userId);
+    await files.moveToBin(fileId, userId);
     res.status(200).send();
   } catch (err) {
     console.error(err);
@@ -165,10 +167,10 @@ router.post("/delete", jwt.authenticate, async (req, res) => {
 });
 
 router.post("/restore", jwt.authenticate, async (req, res) => {
-  const fileName = req.query.filename;
+  const fileId = req.query.fileid;
   const userId = jwt.getIdFromToken(req.cookies.token);
   try {
-    await files.restoreFromBin(fileName, userId);
+    await files.restoreFromBin(fileId, userId);
     res.status(200).send();
   } catch (err) {
     console.error(err);
@@ -396,11 +398,11 @@ router.post("/editPButton", jwt.authenticate, async (req, res) => {
 });
 
 router.post("/deleteFromSystem", jwt.authenticate, async (req, res) => {
-  const filename = req.query.filename;
-  const getEntityId = await files.getEntityIdByName(filename);
-  const fileId = getEntityId.file_id;
+  const owner = jwt.getIdFromToken(req.cookies.token);
+  const fileId = req.query.fileid;
+  const isFolder = await files.checkEntityType(fileId);
   try {
-    await files.deleteEntity(fileId);
+    await files.deleteEntity(isFolder, fileId, owner);
     res.status(200).send();
   } catch (error) {
     throw error;

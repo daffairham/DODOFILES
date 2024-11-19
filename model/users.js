@@ -3,9 +3,20 @@ const db = require("../config/db.js");
 // AMBIL DATA USER
 const getUser = async (username) => {
   try {
-    const query = `SELECT * FROM users WHERE username = $1`;
+    const query = `SELECT user_id, email, username FROM users WHERE username = $1`;
     const result = await db.query(query, [username]);
     return result.rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
+//AMBIL PASSWORD DARI USER
+const getPassword = async (username) => {
+  try {
+    const query = `SELECT password FROM users WHERE username = $1`;
+    const result = await db.query(query, [username]);
+    return result.rows[0].password;
   } catch (error) {
     throw error;
   }
@@ -36,7 +47,7 @@ const checkUserExist = async (username) => {
 const checkEmailExist = async (email) => {
   try {
     const query = `SELECT email FROM users WHERE email = $1`;
-    const result= await db.query(query, [email]);
+    const result = await db.query(query, [email]);
     return result.rows;
   } catch (error) {
     throw error;
@@ -67,4 +78,12 @@ const getUserPermission = async (userId, entityId) => {
   }
 };
 
-module.exports = { getUser, addUser, checkUserExist, checkEmailExist, getUserDetailsById, getUserPermission };
+module.exports = {
+  getUser,
+  getPassword,
+  addUser,
+  checkUserExist,
+  checkEmailExist,
+  getUserDetailsById,
+  getUserPermission,
+};

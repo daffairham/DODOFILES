@@ -18,8 +18,8 @@ router.post("/sign-in", async (req, res) => {
   try {
     const userData = await users.getUser(username);
     if (userData) {
-      const userPassword = userData.password;
-      const isMatch = await bcrypt.compare(password, userPassword);
+      const passwordFromDB = await users.getPassword(username);
+      const isMatch = await bcrypt.compare(password, passwordFromDB);
       if (isMatch) {
         const token = jwt.generateToken(userData);
         res.cookie("token", token, {

@@ -80,8 +80,13 @@ function sharingToast(xhr) {
       bgColor = "#0CC0DF";
     }
   } else if (xhr.status === 200) {
-    message = "File shared successfully.";
-    bgColor = "#0CC0DF";
+    const response = JSON.parse(xhr.responseText);
+    if (response.message === "S") {
+      message = "File shared succesfully!";
+      bgColor = "#0CC0DF";
+    } else {
+      //Toast tidak ditampilkan
+    }
   } else {
     message = "An error occurred, please try again.";
     bgColor = "#808080";
