@@ -8,7 +8,7 @@
         </span></span>
       <button class="text-2xl" onclick="closeMoveFileModal(<%= index %>)">&times;</button>
     </div>
-    <form id="moveForm" hx-post="/moveFile" hx-vals='{"filename": "<%= file.file_name %>"}' class="flex flex-col gap-2"
+    <form id="moveForm" hx-post="/moveFile" hx-vals='{"fileid": "<%= file.file_id %>"}' class="flex flex-col gap-2"
       onsubmit="closeMoveFileModal(<%= index %>)" hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s"
       hx-on="htmx:afterRequest: moveFileToast()">
       <label for="foldernames" class="mb-4">Select a folder to move your file: </label>

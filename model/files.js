@@ -123,8 +123,7 @@ const downloadFile = async (filename, userId, res) => {
       const filePath = path.join(__dirname, "..", "files", uniqueFilename);
       return res.download(filePath, filename, (err) => {
         if (err) {
-          console.error("Error downloading file:", err);
-          return res.status(500).send("Internal Server Error");
+          throw error;
         }
       });
     } else {
@@ -187,10 +186,10 @@ const restoreFromBin = async (fileId, userId) => {
   }
 };
 
-const moveFile = async (userId, filename, parent) => {
-  const query = `UPDATE filesystem_entity SET parent = $1 WHERE file_name = $2 AND file_owner = $3`;
+const moveFile = async (userId, fileId, parent) => {
+  const query = `UPDATE filesystem_entity SET parent = $1 WHERE file_id = $2 AND file_owner = $3`;
   try {
-    await db.query(query, [parent, filename, userId]);
+    await db.query(query, [parent, fileId, userId]);
     if (parent != null) {
       await updateModifiedDateRec(parent);
     }
@@ -211,8 +210,8 @@ const copyFile = async (
   modifiedDate
 ) => {
   const uniqueName = uuidv4();
-  const query = `INSERT INTO filesystem_entity(file_name, upload_date, size, parent, deleted_date, file_owner, is_folder, unique_filename, entity_link)
-                  VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, $8)`;
+  const query = `INSERT INTO filesystem_entity(file_name, upload_date, size, parent, deleted_date, file_owner, is_folder, unique_filename, entity_link, modified_date)
+                  VALUES ($1, $2, $3, $4, NULL, $5, $6, $7, $8, $9)`;
 
   try {
     await db.query(query, [
@@ -299,7 +298,7 @@ const getEntityNameById = async (entity_id) => {
   const query = `SELECT file_name FROM filesystem_entity WHERE file_id = $1`;
   try {
     const result = await db.query(query, [entity_id]);
-    return result.rows[0];
+    return result.rows[0].file_name;
   } catch (error) {
     console.error("Error getting name", error);
     throw error;

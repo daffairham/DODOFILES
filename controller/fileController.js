@@ -212,12 +212,17 @@ router.get("/getFolderList", jwt.authenticate, async (req, res) => {
 
 router.post("/moveFile", jwt.authenticate, async (req, res) => {
   const userId = req.user.user_id;
-  const filename = req.body.filename;
-  const parent = req.body.foldernames === "null" ? null : req.body.foldernames;
+  const fileid = req.body.fileid;
+  let parent;
+  if (req.body.foldernames === "null") {
+    parent = null;
+  } else {
+    parent = req.body.foldernames;
+  }
 
   try {
-    await files.moveFile(userId, filename, parent);
-    const result = files.getEntityIdByName(userId, filename);
+    await files.moveFile(userId, fileid, parent);
+    const result = files.getEntityIdByName(filename);
     const parentDestination = result.file_id;
 
     if (Number(parent) === parentDestination) {
@@ -233,7 +238,8 @@ router.post("/moveFile", jwt.authenticate, async (req, res) => {
 
 router.post("/copyFile", jwt.authenticate, async (req, res) => {
   const userId = req.user.user_id;
-  const filename = req.body.filename;
+  const fileId = req.body.fileid;
+  const filename = await files.getEntityNameById(fileId);
   const parent = req.body.foldernames === "null" ? null : req.body.foldernames;
   const entityLink = uuidv4();
   const fileSize = req.body.fileSize;
@@ -249,10 +255,13 @@ router.post("/copyFile", jwt.authenticate, async (req, res) => {
       userId,
       isFolder,
       sourceFilename,
-      entityLink
+      entityLink,
+      new Date()
     );
 
-    const result = await files.getEntityIdByName(userId, filename);
+    console.log(filename);
+    const result = await files.getEntityIdByName(filename);
+    console.log(result);
     const parentDestination = result.file_id;
 
     if (Number(parent) === parentDestination) {

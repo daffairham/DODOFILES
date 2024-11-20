@@ -1,27 +1,31 @@
-<div id="copy-file-modal<%= index %>" class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
-    <div class="modal-content bg-white rounded-lg p-8 md:flex flex-col w-1/4">
-        <div class="flex justify-between items-center mb-4">
-            <span class="text-center text-[#0CC0DF]">Copy <span class="font-semibold"><%= file.file_name %></span> to another folder</span>
-            <button class="text-2xl" onclick="closeCopyFileModal(<%= index %>)">&times;</button>
-          </div>
-      <form id="copyForm" hx-post="/copyFile" hx-vals='{"filename": "<%= file.file_name %>", 
+<div id="copy-file-modal<%= index %>"
+  class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
+  <div class="modal-content bg-white rounded-lg p-8 md:flex flex-col w-1/4">
+    <div class="flex justify-between items-center mb-4">
+      <span class="text-center text-[#0CC0DF]">Copy <span class="font-semibold">
+          <%= file.file_name %>
+        </span> to another folder</span>
+      <button class="text-2xl" onclick="closeCopyFileModal(<%= index %>)">&times;</button>
+    </div>
+    <form id="copyForm" hx-post="/copyFile" hx-vals='{"fileid": "<%= file.file_id %>", 
         "fileSize": "<%= file.size %>",
         "isFolder": "<%= file.is_folder %>",
-        "sourceFilename": "<%= file.unique_filename %>"}' 
-        class="flex flex-col gap-2"
-        onsubmit="closeCopyFileModal(<%= index %>)" hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s">
-        <label for="foldernames" class="mb-4 text-left text-[#A2A6AD]">Select a folder to copy your file: </label>
-        <select name="foldernames" id="foldernames" class="mb-8 border-2 rounded-md p-2 border-gray-500">
-          <option value="" selected disabled hidden class="text-[#A2A6AD]">Choose a folder...</option>
-          <option value="null" class="text-[#A2A6AD]">Main directory</option>
-            <% for( const row of folderList ) { %>
-              <option class="text-[#A2A6AD]" value="<%= row.file_id %>"><%= row.file_name %></option>
-            <% } %>
-        </select>
-        <div class="md:flex items-center justify-center">
-          <input type="submit" value="Copy"
-            class="bg-[#0CC0DF] hover:bg-[#36b3c9] cursor-pointer text-white font-light text-lg py-4 px-8  rounded" />
-        </div>
-      </form>
-    </div>
+        "sourceFilename": "<%= file.unique_filename %>"}' class="flex flex-col gap-2"
+      onsubmit="closeCopyFileModal(<%= index %>)" hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s">
+      <label for="foldernames" class="mb-4 text-left text-[#A2A6AD]">Select a folder to copy your file: </label>
+      <select name="foldernames" id="foldernames" class="mb-8 border-2 rounded-md p-2 border-gray-500">
+        <option value="" selected disabled hidden class="text-[#A2A6AD]">Choose a folder...</option>
+        <option value="null" class="text-[#A2A6AD]">Main directory</option>
+        <% for( const row of folderList ) { %>
+          <option class="text-[#A2A6AD]" value="<%= row.file_id %>">
+            <%= row.file_name %>
+          </option>
+          <% } %>
+      </select>
+      <div class="md:flex items-center justify-center">
+        <input type="submit" value="Copy"
+          class="bg-[#0CC0DF] hover:bg-[#36b3c9] cursor-pointer text-white font-light text-lg py-4 px-8  rounded" />
+      </div>
+    </form>
   </div>
+</div>
