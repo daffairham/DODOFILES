@@ -80,13 +80,8 @@ function sharingToast(xhr) {
       bgColor = "#0CC0DF";
     }
   } else if (xhr.status === 200) {
-    const response = JSON.parse(xhr.responseText);
-    if (response.message === "S") {
-      message = "File shared succesfully!";
-      bgColor = "#0CC0DF";
-    } else {
-      //Toast tidak ditampilkan
-    }
+    message = "File shared succesfully!";
+    bgColor = "#0CC0DF";
   } else {
     message = "An error occurred, please try again.";
     bgColor = "#808080";
@@ -98,5 +93,16 @@ function sharingToast(xhr) {
     backgroundColor: bgColor,
     gravity: "bottom",
     position: "center",
+  }).showToast();
+}
+
+function removeAccessToast() {
+  Toastify({
+    text: "Access removed.",
+    duration: 2000,
+    close: true,
+    gravity: "bottom",
+    position: "center",
+    backgroundColor: "#0CC0DF",
   }).showToast();
 }

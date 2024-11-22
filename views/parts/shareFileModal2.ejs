@@ -1,0 +1,53 @@
+<div id="share-file-modal"
+  class="modal fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
+
+  <div class="sharemodal-content bg-white rounded-lg p-8 md:flex flex-col w-1/4">
+    <div class="flex justify-between items-center mb-4">
+      <span class="text-center text-[#0CC0DF]">Share <span class="font-semibold">"<%= file.file_name %>"</span></span>
+      <button class="text-2xl text-[#0CC0DF]">&times;</button>
+    </div>
+    <form id="shareFileForm" hx-post="/share" hx-vals='{"entityid": "<%= file.file_id %>"' class="flex flex-col gap-2"
+      hx-on="htmx:afterRequest: sharingToast(event.detail.xhr)">
+      <input type="email" name="email" id="email" placeholder="Input the person's email to share.."
+        class="border-[#0CC0DF] border-2 p-2 rounded-md text-center" required>
+      <label for="permission" class="mt-4 text-base text-[#A2A6AD]">People who have access to this file:</label>
+
+      <div id="shared-users" class="flex flex-col mt-2">
+        <% sharedUserLists.forEach((user, index)=> { %>
+          <div id="users<%= index %>" class="flex items-center justify-between p-2 border-b border-gray-300">
+            <div class="md:flex flex-col">
+              <span>
+                <%= user.username %>
+              </span>
+              <span class="text-[#A2A6AD]">
+                <%= user.email %>
+              </span>
+              <div id="permission" class="md:flex md:flex-row">
+                <% if (user.permission==='r' ) { %>
+                  <span>Permission: <span class="text-green-500">Read</span></span>
+                  <% } else { %>
+                    <span>Permission: <span class="text-blue-500">Write</span></span>
+                    <% } %>
+              </div>
+              <button class="text-left text-red-600 hover:text-red-800" hx-post="/removeAccess"
+                hx-vals='{"userId": "<%= user.user_id %>"}' hx-target="#users<%= index %>" hx-swap="outerHTML swap:0.5s"
+                hx-on="htmx:afterRequest: removeAccessToast()"
+                hx-confirm="Are you sure you want to remove access for this user?">
+                Remove Access
+              </button>
+            </div>
+            <button
+              class="text-white border-2 border-green-500 p-2 rounded-md bg-green-500 hover:border-green-600 hover:bg-green-600"
+              hx-post="/editPButton" hx-target="#users<%= index %>" hx-vals='{"userId": "<%= user.user_id %>"}'>Edit
+              Permission</button>
+          </div>
+          <% }) %>
+      </div>
+
+      <div class="md:flex items-center justify-center mt-4">
+        <input type="submit" value="Share"
+          class="bg-[#0CC0DF] hover:bg-[#36b3c9] cursor-pointer text-white font-light text-lg py-4 px-4 w-1/2 rounded" />
+      </div>
+    </form>
+  </div>
+</div>

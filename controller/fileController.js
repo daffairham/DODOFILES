@@ -240,7 +240,14 @@ router.post("/copyFile", jwt.authenticate, async (req, res) => {
   const userId = req.user.user_id;
   const fileId = req.body.fileid;
   const filename = await files.getEntityNameById(fileId);
-  const parent = req.body.foldernames === "null" ? null : req.body.foldernames;
+
+  let parent;
+  if (req.body.foldernames === "null") {
+    parent = null;
+  } else {
+    parent = req.body.foldernames;
+  }
+
   const entityLink = uuidv4();
   const fileSize = req.body.fileSize;
   const isFolder = req.body.isFolder;
@@ -346,9 +353,17 @@ router.post("/rename", jwt.authenticate, async (req, res) => {
 router.get("/f/:link", jwt.authenticate, async (req, res) => {
   const link = req.params.link;
   try {
-    const results = await files.getEntityDetailsByLink(link);
-    const size = bytes(results[0].size);
-    res.render("fileDetails", { results, size });
+    const fileDetails = await files.getEntityDetailsByLink(link);
+    const size = bytes(fileDetails[0].size);
+    const uploadDate = format(
+      new Date(fileDetails[0].upload_date),
+      "dd MMMM yyyy"
+    );
+    const modifiedDate = format(
+      new Date(fileDetails[0].modified_date),
+      "dd MMMM yyyy"
+    );
+    res.render("fileDetails", { fileDetails, size, uploadDate, modifiedDate });
   } catch (err) {
     console.error(err);
     res.status(500).send("Server Error");
@@ -368,6 +383,7 @@ router.get("/sharedUsers", jwt.authenticate, async (req, res) => {
 
 router.get("/properties", jwt.authenticate, async (req, res) => {
   const entityId = req.query.fileid;
+  console.log(entityId);
   try {
     const fileDetails = await files.getEntityDetailsById(entityId);
     const size = bytes(fileDetails[0].size);

@@ -10,11 +10,10 @@ router.post("/share", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const targetEmail = req.body.email;
   const entityId = req.body.entityid;
-  let permission = "r";
+  const permission = "r";
   const currentUserEmail = userData.email;
   try {
-    const entityTipe = await files.checkEntityType(entityId);
-    const isFolder = entityTipe.is_folder;
+    // const isFolder = entityTipe.is_folder;
     const userId = await sharing.getUserIdToShare(targetEmail);
     const permissionExist = await sharing.checkPermissionExist(
       userId,
@@ -35,19 +34,16 @@ router.post("/share", jwt.authenticate, async (req, res) => {
       return res.status(409).json({ message: "2" });
     }
 
-    /* jika yang dibagikan adalah sebuah folder, ambil semua entitas dalam folder tersebut lalu lakukan looping untuk memasukan
-    entitas yang ada dalam folder tersebut */
-    if (isFolder) {
-      await sharing.grantPermission(userId, entityId, permission);
-      const childrenEntity = await files.getChildFromParent(entityId);
-      for (const file_id of childrenEntity) {
-        await sharing.grantPermission(userId, file_id.file_id, permission);
-      }
-    } else {
-      await sharing.grantPermission(userId, entityId, permission);
-    }
+    const index = req.body.index;
+    console.log(index);
+    await sharing.grantPermission(userId, entityId, permission);
     const sharedUserLists = await sharing.getSharedUsers(entityId);
-    res.render("parts/sharedUsers", { sharedUserLists });
+    const fileDetails = await files.getEntityDetailsById(entityId);
+    res.render("parts/sharedUsers", {
+      sharedUserLists,
+      index,
+      file: fileDetails[0],
+    });
   } catch (err) {
     console.error(err);
   }
@@ -60,22 +56,17 @@ router.post("/removeAccess", jwt.authenticate, async (req, res) => {
   const entityName = result.file_name;
   try {
     const isFolder = await files.checkEntityType(entityId);
-    // const isFolder = entityTipe.is_folder;
-    // console.log(entityTipe);
-    console.log(isFolder);
     if (isFolder) {
       await sharing.removeSharedAccess(userId, entityName);
       const childrenEntity = await files.getChildFromParent(entityId);
       for (const file_id of childrenEntity) {
         const id = await files.getEntityNameById(file_id.file_id);
-        const childrenName = id.file_name;
-        await sharing.removeSharedAccess(userId, childrenName); //hapus akses untuk entity dlm folder
+        await sharing.removeSharedAccess(userId, file_id.file_id); //hapus akses untuk entity dlm folder
       }
     } else {
-      const id = await files.getEntityIdByName(entityName);
-      await sharing.removeSharedAccess(userId, id.file_id);
+      await sharing.removeSharedAccess(userId, entityId);
     }
-    sharing.removeSharedAccess(userId, entityName);
+    sharing.removeSharedAccess(userId, entityId);
     res.status(200).send();
   } catch (err) {
     console.error(err);
@@ -101,6 +92,23 @@ router.get("/shared-files", jwt.authenticate, async (req, res) => {
     res.status(500).send("Error");
   }
 });
+
+// router.get("/sharefile", jwt.authenticate, async (req, res) => {
+//   const entityId = req.query.fileid;
+//   const sharedUserLists = await sharing.getSharedUsers(entityId);
+//   const fileList = await files.getEntityDetailsById(entityId);
+//   try {
+//     // console.log(sharedUserLists);
+//     console.log(fileList[0]);
+//     res.render("parts/shareFileModal2", {
+//       sharedUserLists,
+//       file: fileList[0],
+//     });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).send();
+//   }
+// });
 
 router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
   const userData = req.user;

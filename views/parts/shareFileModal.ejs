@@ -1,20 +1,22 @@
 <div id="share-file-modal<%= index %>"
   class="modal hidden fixed inset-0 z-50 overflow-auto bg-black bg-opacity-50 flex justify-center items-center">
 
-  <div class="modal-content bg-white rounded-lg p-8 md:flex flex-col w-1/4">
+  <div class="sharemodal-content bg-white rounded-lg p-8 md:flex flex-col w-1/4">
     <div class="flex justify-between items-center mb-4">
       <span class="text-center text-[#0CC0DF]">Share <span class="font-semibold">"<%= file.file_name %>"</span></span>
       <button class="text-2xl text-[#0CC0DF]" onclick="closeShareFileModal(<%= index %>)">&times;</button>
     </div>
-    <form id="shareFileForm" hx-post="/share" hx-vals='{"entityid": "<%= file.file_id %>"}' class="flex flex-col gap-2"
-      onsubmit="closeShareFileModal(<%= index %>)" hx-swap="outerHTML swap:0.5s"
-      hx-on="htmx:afterRequest: sharingToast(event.detail.xhr)">
+
+    <form id="shareFileForm" hx-post="/share" hx-vals='{"entityid": "<%= file.file_id %>", "index": "<%= index %>"}'
+      class="flex flex-col gap-2" onsubmit="closeShareFileModal(<%= index %>)"
+      hx-target=".shared-users-target<%= index %>" hx-on="htmx:afterRequest: sharingToast(event.detail.xhr)">
       <input type="email" name="email" id="email" placeholder="Input the person's email to share.."
         class="border-[#0CC0DF] border-2 p-2 rounded-md text-center" required>
-      <label for="permission" class="mt-4 text-base text-[#A2A6AD]">People who have access to this file:</label>
+      <span class="ml-2 mt-4 text-base text-[#A2A6AD]">People who have access to this file:</span>
 
       <div id="shared-users<%= index %>" class="flex flex-col mt-2">
       </div>
+      <div class="shared-users-target<%= index %> flex flex-col mt-2"></div>
 
       <div class="md:flex items-center justify-center mt-4">
         <input type="submit" value="Share"

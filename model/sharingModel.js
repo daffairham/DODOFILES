@@ -106,7 +106,6 @@ const grantPermission = async (userId, folderId, permission) => {
       `;
       await db.query(insertQuery, [userId, entityId, permission]);
     }
-    return;
   } catch (err) {
     throw err;
   }
@@ -163,7 +162,7 @@ const removeAccessFromOwner = async (user_id, entity_id) => {
                     USING filesystem_entity
                     WHERE shared_files.file_id = filesystem_entity.file_id
                     AND shared_files.user_id = $1
-                    AND filesystem_entity.file_name = $2`;
+                    AND filesystem_entity.id = $2`;
     const result = await db.query(query, [user_id, entity_id]);
     return result.rows;
   } catch (err) {
@@ -178,11 +177,10 @@ const removeSharedAccess = async (user_id, entity_id) => {
                     USING filesystem_entity
                     WHERE shared_files.file_id = filesystem_entity.file_id
                     AND shared_files.user_id = $1
-                    AND filesystem_entity.file_name = $2`;
+                    AND filesystem_entity.file_id = $2`;
     const result = await db.query(query, [user_id, entity_id]);
     return result.rows;
   } catch (err) {
-    console.error("Error getting shared users:", err);
     throw err;
   }
 };

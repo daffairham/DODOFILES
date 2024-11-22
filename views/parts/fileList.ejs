@@ -47,33 +47,37 @@
                         <button onclick="event.stopPropagation(); openCopyFileModal(<%= index %>)"
                           class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Copy file
                         </button>
-                        <% } else { %>
-                          <button onclick="event.stopPropagation();"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">
-                            <a href="/downloadFolder/<%= file.file_id %>">Download Folder</a>
+                        <% } %>
+                          <button onclick="event.stopPropagation(); openRenameModal(<%= index %>)"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Rename
                           </button>
-                          <% } %>
-                            <button onclick="event.stopPropagation(); openRenameModal(<%= index %>)"
-                              class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Rename
-                            </button>
-                            <button onclick="event.stopPropagation(); openMoveFileModal(<%= index %>)"
-                              class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move file
-                            </button>
-                            <button onclick="event.stopPropagation();" hx-post="/delete?filename=<%= file.file_name %>"
-                              hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s" hx-boost="false"
-                              hx-push-url="false" hx-on="htmx:afterRequest: binToast()"
-                              class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move to recycle bin
-                            </button>
-                            <button onclick="event.stopPropagation(); openShareFileModal(<%= index %>)"
-                              hx-get="/sharedUsers" hx-vals='{"fileid": "<%= file.file_id %>"}' hx-boost="false"
-                              hx-push-url="false" hx-target="#shared-users<%= index %>"
-                              class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Share
-                            </button>
-                            <button onclick="event.stopPropagation(); openPropertiesModal(<%= index %>)"
-                              hx-get="/properties" hx-boost="false" hx-push-url="false"
-                              hx-target="#entity-details<%= index %>" hx-vals='{"fileid": "<%= file.file_id %>"}'
-                              class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Properties
-                            </button>
+                          <button onclick="event.stopPropagation(); openMoveFileModal(<%= index %>)"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move file
+                          </button>
+                          <button onclick="event.stopPropagation();" hx-post="/delete?filename=<%= file.file_name %>"
+                            hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s" hx-boost="false"
+                            hx-push-url="false" hx-on="htmx:afterRequest: binToast()"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move to recycle bin
+                          </button>
+                          <button onclick="event.stopPropagation(); openShareFileModal(<%= index %>)"
+                            hx-get="/sharedUsers" hx-vals='{"fileid": "<%= file.file_id %>"}' hx-boost="false"
+                            hx-push-url="false" hx-target="#shared-users<%= index %>"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Share
+                          </button>
+                          <!-- <button onclick="event.stopPropagation()" hx-get="/sharefile" hx-boost="false"
+                            hx-push-url="false" hx-vals='{"fileid": "<%= file.file_id %>"}'
+                            class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Share
+                          </button> -->
+                          <button onclick="event.stopPropagation(); openPropertiesModal(<%= index %>)"
+                            hx-get="/properties" hx-boost="false" hx-push-url="false"
+                            hx-target="#entity-details<%= index %>" hx-vals='{"fileid": "<%= file.file_id %>"}'
+                            class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Properties
+                          </button>
+                          <button onclick="window.open('/f/<%= file.entity_link %>', '_blank')"
+                            class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">
+                            Open in new tab
+                          </button>
+
                     </div>
                 </div>
                 <%- include('renameModal.ejs', {index, file}) %>

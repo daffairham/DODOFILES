@@ -1,8 +1,8 @@
-function openModal() {
+function uploadModal() {
   document.getElementById("upload-modal").classList.remove("hidden");
 }
 
-function closeModal() {
+function closeUploadModal() {
   document.getElementById("upload-modal").classList.add("hidden");
 }
 

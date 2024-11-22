@@ -1,15 +1,18 @@
-<span class="text-center mb-4 font-bold ">Create a new folder</span>
-<div id="tabs" class="md:flex flex-row mx-auto gap-12 border-b mb-4">
-    <button hx-get="/fileTab" hx-target="#upload-modal" class="hover:bg-gray-300 rounded-md p-2">Upload file</button>
-    <button hx-get="/folderTab" hx-target="#file-modal" class="hover:bg-gray-300 rounded-md">New folder</button>
+<span class="text-center text-[#0CC0DF] ml-2 mb-6 font-medium text-lg">Create a New Folder</span>
+<div id="tabs" class="md:flex flex-row mx-auto gap-12 items-center justify-center border-b mb-4">
+    <button hx-get="/fileTab" hx-target="#upload-modal" class="hover:bg-gray-300 rounded-md p-2 text-[#A2A6AD]">Upload
+        File</button>
+    <button class="cursor-default rounded-md text-[#0CC0DF]">New Folder</button>
 </div>
-<form id="uploadForm" hx-post="/createFolder" hx-encoding="multipart/form-data"
-    class="flex flex-col gap-2 mt-2" onsubmit="closeModal()" hx-target=".main" hx-swap="outerHTML">
-    <label for="folder-name">Folder name:</label>
-    <input type="text" name="folder-name" id="folder-name" class="border-gray-400 border-2 p-2 rounded-md">
-    <label for="folderparent" class="mb-2">Where do you want this folder to be created? </label>
-    <select name="folderparent" id="folderparent" class="mb-8 border-2 rounded-md p-2 border-gray-500" required>
-        <option value="" selected disabled hidden>Choose a folder...</option>
+<form id="uploadForm" hx-post="/createFolder" hx-encoding="multipart/form-data" class="flex flex-col gap-2 mt-2"
+    onsubmit="closeModal()" hx-target=".main" hx-swap="outerHTML">
+    <label for="folder-name" class="text-[#8ba2a8]">Folder name:</label>
+    <input type="text" name="folder-name" id="folder-name"
+        class="border-[#0CC0DF] border-2 p-2 rounded-md focus:border-cyan-300">
+    <label for="folderparent" class="text-[#8ba2a8]">Where do you want this folder to be created? </label>
+    <select name="folderparent" id="folderparent"
+        class="mb-8 border-2 rounded-md p-2 border-[#0CC0DF] focus:border-cyan-300" required>
+        <option class="text-gray-500" value="" selected disabled hidden>Choose a folder...</option>
         <option value="null">Main directory</option>
         <% for( const row of folderList ) { %>
             <option value="<%= row.file_id %>">
@@ -17,5 +20,8 @@
             </option>
             <% } %>
     </select>
-    <input type="submit"class="bg-gray-500 hover:bg-gray-700 cursor-pointer text-white font-bold py-2 px-4 rounded"/>
+    <input type="submit" value="Create Folder"
+        class="bg-[#0CC0DF] hover:bg-[#36b3c9] cursor-pointer text-white font-semibold py-2 px-4 rounded" />
 </form>
+</div>
+</div>
