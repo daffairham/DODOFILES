@@ -54,7 +54,7 @@
                           <button onclick="event.stopPropagation(); openMoveFileModal(<%= index %>)"
                             class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move file
                           </button>
-                          <button onclick="event.stopPropagation();" hx-post="/delete?filename=<%= file.file_name %>"
+                          <button onclick="event.stopPropagation();" hx-post="/delete?fileid=<%= file.file_id %>"
                             hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s" hx-boost="false"
                             hx-push-url="false" hx-on="htmx:afterRequest: binToast()"
                             class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">Move to recycle bin

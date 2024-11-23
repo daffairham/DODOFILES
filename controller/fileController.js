@@ -53,85 +53,6 @@ router.post("/upload", jwt.authenticate, async (req, res) => {
   }
 });
 
-router.post("/uploadMultiple", jwt.authenticate, async (req, res) => {
-  const filesUploaded = req.files.file;
-  const userData = req.user;
-  const userId = jwt.getIdFromToken(req.cookies.token);
-  const parent = req.body.folderId || null;
-  try {
-    for (const file of filesUploaded) {
-      await files.uploadFile(file, parent, userId);
-    }
-    if (parent === null) {
-      const fileList = await files.getFilesInRoot(userId);
-      const folderList = await files.getUserFolder(userId);
-      let entityAmt = fileList.length + folderList.length;
-      res.render("parts/fileList", {
-        fileList,
-        userData,
-        folderName: "",
-        folderList,
-        entityAmt,
-      });
-    } else {
-      const fileList = await files.getFilesInFolder(userId, parent);
-      const folderList = await files.getUserFolder(userId);
-      let entityAmt = fileList.length + folderList.length;
-      const folderName = await files.getFolderName(userId, parent);
-      res.render("parts/fileList", {
-        fileList,
-        userData,
-        folderName: folderName.rows[0].file_name,
-        folderList,
-        entityAmt,
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
-  }
-});
-
-router.post("/uploadFolder", jwt.authenticate, async (req, res) => {
-  const filesUploaded = req.files.file;
-  const folderName = req.body.folderName;
-  const userData = req.user;
-  const userId = jwt.getIdFromToken(req.cookies.token);
-  const parent = req.body.folderId || null;
-  try {
-    for (const file of filesUploaded) {
-      await files.uploadFile(file, parent, userId);
-    }
-    if (parent === null) {
-      const fileList = await files.getFilesInRoot(userId);
-      const folderList = await files.getUserFolder(userId);
-      let entityAmt = fileList.length + folderList.length;
-      res.render("parts/fileList", {
-        fileList,
-        userData,
-        folderName: "",
-        folderList,
-        entityAmt,
-      });
-    } else {
-      const fileList = await files.getFilesInFolder(userId, parent);
-      const folderList = await files.getUserFolder(userId);
-      let entityAmt = fileList.length + folderList.length;
-      const folderName = await files.getFolderName(userId, parent);
-      res.render("parts/fileList", {
-        fileList,
-        userData,
-        folderName: folderName.rows[0].file_name,
-        folderList,
-        entityAmt,
-      });
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
-  }
-});
-
 router.get("/download", jwt.authenticate, async (req, res) => {
   const fileName = req.query.filename;
   const userId = jwt.getIdFromToken(req.cookies.token);
@@ -153,9 +74,7 @@ router.get("/downloadFolder/:folderId", jwt.authenticate, async (req, res) => {
 });
 
 router.post("/delete", jwt.authenticate, async (req, res) => {
-  const fileName = req.query.filename;
-  const fileIdFromDB = await files.getEntityIdByName(fileName);
-  const fileId = await fileIdFromDB.file_id;
+  const fileId = req.query.fileid;
   const userId = jwt.getIdFromToken(req.cookies.token);
   try {
     await files.moveToBin(fileId, userId);
@@ -221,13 +140,16 @@ router.post("/moveFile", jwt.authenticate, async (req, res) => {
   }
 
   try {
-    await files.moveFile(userId, fileid, parent);
-    const result = files.getEntityIdByName(filename);
-    const parentDestination = result.file_id;
-
-    if (Number(parent) === parentDestination) {
-      res.status(200).send();
+    const entityDetails = await files.getEntityDetailsById(fileid);
+    const currentParent = entityDetails[0].parent;
+    console.log(currentParent, parent);
+    if (
+      currentParent === Number(parent) ||
+      (currentParent === null && parent === null)
+    ) {
+      return res.status(400).json("");
     } else {
+      await files.moveFile(userId, fileid, parent);
       res.status(200).send();
     }
   } catch (err) {
@@ -240,7 +162,7 @@ router.post("/copyFile", jwt.authenticate, async (req, res) => {
   const userId = req.user.user_id;
   const fileId = req.body.fileid;
   const filename = await files.getEntityNameById(fileId);
-
+  const userData = req.user;
   let parent;
   if (req.body.foldernames === "null") {
     parent = null;
@@ -266,19 +188,32 @@ router.post("/copyFile", jwt.authenticate, async (req, res) => {
       new Date()
     );
 
-    console.log(filename);
-    const result = await files.getEntityIdByName(filename);
-    console.log(result);
-    const parentDestination = result.file_id;
-
-    if (Number(parent) === parentDestination) {
-      res.status(200).send();
+    if (parent === null) {
+      const fileList = await files.getFilesInRoot(userId);
+      const folderList = await files.getUserFolder(userId);
+      let entityAmt = fileList.length + folderList.length;
+      res.render("parts/fileList", {
+        fileList,
+        userData,
+        folderName: "",
+        folderList,
+        entityAmt,
+      });
     } else {
-      res.status(200).send();
+      const fileList = await files.getFilesInFolder(userId, parent);
+      const folderList = await files.getUserFolder(userId);
+      let entityAmt = fileList.length + folderList.length;
+      const folderName = await files.getFolderName(userId, parent);
+      res.render("parts/fileList", {
+        fileList,
+        userData,
+        folderName: folderName.rows[0].file_name,
+        folderList,
+        entityAmt,
+      });
     }
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server Error");
+    throw err;
   }
 });
 

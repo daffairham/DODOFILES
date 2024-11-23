@@ -1,11 +1,20 @@
-function moveFileToast() {
+function moveFileToast(xhr) {
+  let message, bgColor;
+
+  if (xhr.status === 400) {
+    message = "You can't move to the same directory!";
+    bgColor = "#FF4D4D";
+  } else {
+    message = "File moved successfully.";
+    bgColor = "#FF4D4D";
+  }
   Toastify({
-    text: "File has been moved succesfully.",
-    duration: 2000,
+    text: message,
+    duration: 3000,
     close: true,
+    backgroundColor: bgColor,
     gravity: "bottom",
     position: "center",
-    backgroundColor: "#0CC0DF",
   }).showToast();
 }
 

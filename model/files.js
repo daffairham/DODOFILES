@@ -187,12 +187,15 @@ const restoreFromBin = async (fileId, userId) => {
 };
 
 const moveFile = async (userId, fileId, parent) => {
-  const query = `UPDATE filesystem_entity SET parent = $1 WHERE file_id = $2 AND file_owner = $3`;
+  const query = `UPDATE filesystem_entity SET parent = $1 WHERE file_id = $2 AND file_owner = $3
+  RETURNING file_id, parent`;
   try {
-    await db.query(query, [parent, fileId, userId]);
+    const result = await db.query(query, [parent, fileId, userId]);
+
     if (parent != null) {
       await updateModifiedDateRec(parent);
     }
+    return result.rows[0];
   } catch (error) {
     throw error;
   }

@@ -9,7 +9,7 @@
     </div>
     <form id="uploadForm" hx-post="/rename" hx-target="#content" class="flex flex-col gap-2"
       onsubmit="closeRenameModal(<%= index %>)" hx-vals='{"fileid": "<%= file.file_id %>"}'
-      hx-on="htmx:afterRequest: renameToast()">
+      hx-on="submit: renameToast()">
       <input type="text" value="<%= file.file_name %>" name="newName" id="newName"
         class="p-2 border-[1px] border-[#0CC0DF] bg-white rounded-md">
       <div class="md:flex items-center justify-center mt-4">

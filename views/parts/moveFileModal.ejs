@@ -10,7 +10,7 @@
     </div>
     <form id="moveForm" hx-post="/moveFile" hx-vals='{"fileid": "<%= file.file_id %>"}' class="flex flex-col gap-2"
       onsubmit="closeMoveFileModal(<%= index %>)" hx-target=".file-item<%= index %>" hx-swap="outerHTML swap:0.5s"
-      hx-on="htmx:afterRequest: moveFileToast()">
+      hx-on="htmx:afterRequest: moveFileToast(event.detail.xhr)">
       <label for="foldernames" class="mb-4">Select a folder to move your file: </label>
       <select name="foldernames" id="foldernames" class="mb-8 border-2 rounded-md p-2 border-[#0CC0DF]">
         <option value="" selected disabled hidden>Choose a folder...</option>

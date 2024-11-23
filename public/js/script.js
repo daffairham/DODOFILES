@@ -6,6 +6,14 @@ function closeUploadModal() {
   const progressContainer = document.getElementById("progress-container");
   progressContainer.classList.add("hidden");
   document.getElementById("upload-modal").classList.add("hidden");
+  Toastify({
+    text: "File Uploaded!",
+    duration: 2000,
+    close: true,
+    gravity: "bottom",
+    position: "center",
+    backgroundColor: "#0CC0DF",
+  }).showToast();
 }
 
 function handleFormSubmit(event) {
