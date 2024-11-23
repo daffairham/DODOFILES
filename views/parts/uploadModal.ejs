@@ -7,12 +7,18 @@
         class="hover:bg-gray-300 hover:text-[#0CC0DF] rounded-md text-[#A2A6AD] p-2">New Folder</button>
     </div>
     <form id="uploadForm" hx-post="/upload" hx-encoding="multipart/form-data" hx-target="#content"
-      class="flex flex-col items-center gap-2 mt-2" onsubmit="closeModal()" hx-vals='{"folderId": "<%= folderId %>"}'>
+      class="flex flex-col items-center gap-2 mt-2" hx-on="htmx:beforeRequest: handleFormSubmit(event)
+       htmx:afterRequest: closeUploadModal()" hx-vals='{"folderId": "<%= folderId %>"}'>
       <input type="file" name="file" id="file" required class="ml-2 mb-4 text-[#A2A6AD]" />
       <div class="md:flex items-center justify-center">
         <input type="submit" value="Upload"
           class="bg-[#0CC0DF] hover:bg-[#36b3c9] cursor-pointer text-white font-semibold text-lg py-4 px-8  rounded" />
       </div>
     </form>
+    <div id="progress-container" class="w-full mt-4 rounded-md hidden">
+      <span class="text-[#A2A6AD]">Your file is being uploaded, please wait..</span>
+      <progress id="progress-bar" value="0" max="100" class="w-full h-2 bg-gray-200 rounded-full"></progress>
+      <span id="progress-text" class="text-center text-[#0CC0DF] mt-2">0%</span>
+    </div>
   </div>
 </div>

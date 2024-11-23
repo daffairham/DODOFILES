@@ -3,7 +3,24 @@ function uploadModal() {
 }
 
 function closeUploadModal() {
+  const progressContainer = document.getElementById("progress-container");
+  progressContainer.classList.add("hidden");
   document.getElementById("upload-modal").classList.add("hidden");
+}
+
+function handleFormSubmit(event) {
+  const progressContainer = document.getElementById("progress-container");
+  const progressBar = document.getElementById("progress-bar");
+  const progressText = document.getElementById("progress-text");
+
+  progressContainer.classList.remove("hidden");
+  event.detail.xhr.upload.addEventListener("progress", function (e) {
+    if (e.lengthComputable) {
+      const percent = (e.loaded / e.total) * 100;
+      progressBar.value = percent;
+      progressText.textContent = `${Math.round(percent)}%`;
+    }
+  });
 }
 
 function openUploadMultiModal() {

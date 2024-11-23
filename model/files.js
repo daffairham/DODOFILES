@@ -45,7 +45,7 @@ const uploadFile = async (file, parent, fileOwner) => {
   const uploadPath = path.join(__dirname, "../files", uniqueFilename);
 
   try {
-    await file.mv(uploadPath);
+    await fs.writeFile(uploadPath, file.data);
     const uploadedFile = await saveFileToDatabase(
       file.name,
       uploadDate,
