@@ -35,7 +35,6 @@ router.post("/share", jwt.authenticate, async (req, res) => {
     }
 
     const index = req.body.index;
-    console.log(index);
     await sharing.grantPermission(userId, entityId, permission);
     const sharedUserLists = await sharing.getSharedUsers(entityId);
     const fileDetails = await files.getEntityDetailsById(entityId);

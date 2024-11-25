@@ -219,23 +219,24 @@ router.post("/copyFile", jwt.authenticate, async (req, res) => {
 
 router.post("/createFolder", jwt.authenticate, async (req, res) => {
   const userId = jwt.getIdFromToken(req.cookies.token);
-  const fileName = req.body["folder-name"];
-  const parent =
-    req.body.folderparent === "null" ? null : req.body.folderparent;
+  const folderName = req.body["folder-name"];
+  let folderLocation;
+  if (req.body.folderparent === "null") {
+    folderLocation = null;
+  } else {
+    folderLocation = req.body.folderparent;
+  }
 
   try {
     const newFolder = await files.createFolder(
-      fileName,
+      folderName,
       new Date(),
-      parent,
+      folderLocation,
       userId,
       new Date()
     );
-
-    if (parent !== null) {
-      await sharing.handleNewUpload(newFolder.file_id, parent, userId);
-    }
-    if (parent !== null) {
+    if (folderLocation !== null) {
+      await sharing.handleNewUpload(newFolder.file_id, folderLocation, userId);
       res.redirect(`/folder/${parent}`);
     } else {
       res.redirect(`/`);
