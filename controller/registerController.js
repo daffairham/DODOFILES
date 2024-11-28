@@ -16,7 +16,9 @@ router.post("/register", async (req, res) => {
     const userExist = await users.checkUserExist(username);
     const emailExist = await users.checkEmailExist(email);
     if (userExist.length > 0 || emailExist.length > 0) {
-      res.render("register", {serverMessage: "Username or email is already taken. Please try again."})
+      res.render("register", {
+        serverMessage: "Username or email is already taken. Please try again.",
+      });
     } else {
       // FUNGSI HASHING PASSWORD DARI LIBRARY BCRYPT
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -26,7 +28,7 @@ router.post("/register", async (req, res) => {
       // MASUKKAN TOKEN JWT, DAN ALIHKAN USER KE HOMEPAGE
       const userData = await users.getUser(username);
       if (userData) {
-        const userPassword = userData.password;
+        const userPassword = await users.getPassword(username);
         const isMatch = await bcrypt.compare(password, userPassword);
         if (isMatch) {
           const token = jwt.generateToken(userData);

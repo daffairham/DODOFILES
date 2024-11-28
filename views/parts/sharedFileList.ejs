@@ -12,7 +12,8 @@
           <p class="text-sm font-medium text-gray-700 flex-1 truncate pr-10">
             <%= file.file_name %>
           </p>
-          <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 hover:bg-[#0cbfdfa8] hover:rounded-full focus:outline-none"
+          <button
+            class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 hover:bg-[#0cbfdfa8] hover:rounded-full focus:outline-none"
             onclick="event.stopPropagation(); toggleDropdown(this, <%= index %>)">
             <img src="/img/ellipsis_dark.png" alt="">
           </button>
@@ -35,14 +36,13 @@
                     <button class="block px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]"><a
                         href="/download?filename=<%= file.file_name %>" class="file-link">Download</a></button>
                     <% } %>
-                      <% if (file.file_permission === 'rw') { %>
+                      <% if (file.permission==='rw' ) { %>
                         <button onclick="event.stopPropagation(); openRenameSharedModal(<%= index %>)"
                           class="px-4 py-2 text-sm text-gray-700 hover:text-[#0CC0DF]">
                           Rename
                         </button>
                         <% } else { %>
-                          <button disabled
-                            class="px-4 py-2 text-sm text-gray-500">
+                          <button disabled class="px-4 py-2 text-sm text-gray-500">
                             Rename
                           </button>
                           <% } %>

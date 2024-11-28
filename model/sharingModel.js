@@ -6,40 +6,43 @@ const getSharedFiles = async (userId) => {
   try {
     const query = `
       WITH RECURSIVE shared_entities AS (
-        SELECT 
-          filesystem_entity.file_id,
-          filesystem_entity.file_name,
-          filesystem_entity.upload_date,
-          filesystem_entity.size,
-          filesystem_entity.parent,
-          filesystem_entity.deleted_date,
-          filesystem_entity.file_owner,
-          filesystem_entity.is_folder,
-          filesystem_entity.unique_filename,
-          filesystem_entity.entity_link,
-          filesystem_entity.modified_date
-        FROM shared_files
-        INNER JOIN filesystem_entity ON shared_files.file_id = filesystem_entity.file_id
-        WHERE shared_files.user_id = $1
+    SELECT 
+        filesystem_entity.file_id,
+        filesystem_entity.file_name,
+        filesystem_entity.upload_date,
+        filesystem_entity.size,
+        filesystem_entity.parent,
+        filesystem_entity.deleted_date,
+        filesystem_entity.file_owner,
+        filesystem_entity.is_folder,
+        filesystem_entity.unique_filename,
+        filesystem_entity.entity_link,
+        filesystem_entity.modified_date,
+        shared_files.permission
+    FROM shared_files
+    INNER JOIN filesystem_entity ON shared_files.file_id = filesystem_entity.file_id
+    WHERE shared_files.user_id = $1
 
-        UNION
+    UNION
 
-        SELECT 
-          filesystem_entity.file_id,
-          filesystem_entity.file_name,
-          filesystem_entity.upload_date,
-          filesystem_entity.size,
-          filesystem_entity.parent,
-          filesystem_entity.deleted_date,
-          filesystem_entity.file_owner,
-          filesystem_entity.is_folder,
-          filesystem_entity.unique_filename,
-          filesystem_entity.entity_link,
-          filesystem_entity.modified_date
-        FROM filesystem_entity 
-        INNER JOIN shared_entities ON filesystem_entity.parent = shared_entities.file_id
-      )
-      SELECT * FROM shared_entities WHERE parent IS NULL AND deleted_date IS NULL;
+    SELECT 
+        filesystem_entity.file_id,
+        filesystem_entity.file_name,
+        filesystem_entity.upload_date,
+        filesystem_entity.size,
+        filesystem_entity.parent,
+        filesystem_entity.deleted_date,
+        filesystem_entity.file_owner,
+        filesystem_entity.is_folder,
+        filesystem_entity.unique_filename,
+        filesystem_entity.entity_link,
+        filesystem_entity.modified_date,
+        shared_files.permission
+    FROM filesystem_entity 
+    INNER JOIN shared_entities ON filesystem_entity.parent = shared_entities.file_id
+    INNER JOIN shared_files ON filesystem_entity.file_id = shared_files.file_id
+)
+SELECT * FROM shared_entities WHERE parent IS NULL AND deleted_date IS NULL;
     `;
 
     const result = await db.query(query, [userId]);

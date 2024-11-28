@@ -79,6 +79,7 @@ router.get("/shared-files", jwt.authenticate, async (req, res) => {
 
   try {
     const fileList = await sharing.getSharedFiles(userId);
+    console.log(fileList);
     res.render("sharedFiles", {
       fileList,
       userData,
