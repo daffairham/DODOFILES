@@ -6,7 +6,6 @@ const getSharedFiles = async (userId) => {
   try {
     const query = `
       WITH RECURSIVE shared_entities AS (
-    -- Ambil semua entitas yang dibagikan langsung
     SELECT 
         fe.file_id,
         fe.file_name,
@@ -26,7 +25,6 @@ const getSharedFiles = async (userId) => {
 
     UNION
 
-    -- Rekursi: Ambil semua anak dari folder-folder yang dibagikan
     SELECT 
         fe.file_id,
         fe.file_name,
@@ -39,15 +37,14 @@ const getSharedFiles = async (userId) => {
         fe.unique_filename,
         fe.entity_link,
         fe.modified_date,
-        se.permission -- Izin diwariskan dari folder induk
+        se.permission
     FROM filesystem_entity fe
     INNER JOIN shared_entities se ON fe.parent = se.file_id
     WHERE se.is_folder = true AND fe.deleted_date IS NULL
 )
 SELECT * FROM shared_entities
 WHERE deleted_date IS NULL;
-
-    `;
+ `;
 
     const result = await db.query(query, [userId]);
     return result.rows;
