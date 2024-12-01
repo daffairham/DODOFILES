@@ -135,7 +135,6 @@ const downloadFile = async (filename, userId, res) => {
         userId,
       ]);
       if (sharedResult.rows.length === 0) {
-        console.log(userId, fileData);
         return res
           .status(403)
           .send("You don't have permission to download this file.");

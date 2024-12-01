@@ -1,7 +1,6 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const router = express.Router();
-const db = require("../config/db.js");
 const jwt = require("../config/jwt.js");
 const users = require("../model/users.js");
 
@@ -32,12 +31,9 @@ router.post("/sign-in", async (req, res) => {
       }
     } else {
       res.render("login", { serverMessage: "Account is not registered." });
-      // serverMessage = "Account not registered.";
-      // res.render("login", {serverMessage});
     }
   } catch (error) {
-    console.error("Error:", error);
-    res.status(500).send("Server Error");
+    res.status(500).send();
   }
 });
 

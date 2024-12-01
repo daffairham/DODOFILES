@@ -49,7 +49,7 @@ router.post("/upload", jwt.authenticate, async (req, res) => {
     }
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).send();
   }
 });
 
@@ -64,7 +64,7 @@ router.get("/download", jwt.authenticate, async (req, res) => {
     await files.downloadFile(fileName, userId, res);
   } catch (err) {
     console.error(err);
-    res.status(500).send("Internal Server Error");
+    res.status(500).send();
   }
 });
 
@@ -142,7 +142,6 @@ router.post("/moveFile", jwt.authenticate, async (req, res) => {
   try {
     const entityDetails = await files.getEntityDetailsById(fileid);
     const currentParent = entityDetails[0].parent;
-    console.log(currentParent, parent);
     if (
       currentParent === Number(parent) ||
       (currentParent === null && parent === null)
@@ -302,7 +301,7 @@ router.get("/f/:link", jwt.authenticate, async (req, res) => {
     res.render("fileDetails", { fileDetails, size, uploadDate, modifiedDate });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).send();
   }
 });
 
@@ -319,7 +318,6 @@ router.get("/sharedUsers", jwt.authenticate, async (req, res) => {
 
 router.get("/properties", jwt.authenticate, async (req, res) => {
   const entityId = req.query.fileid;
-  console.log(entityId);
   try {
     const fileDetails = await files.getEntityDetailsById(entityId);
     const size = bytes(fileDetails[0].size);

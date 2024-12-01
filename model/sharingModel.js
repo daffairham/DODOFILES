@@ -1,4 +1,3 @@
-const { download } = require("express/lib/response.js");
 const db = require("../config/db.js");
 const fileModel = require("./files.js");
 
@@ -7,40 +6,40 @@ const getSharedFiles = async (userId) => {
     const query = `
       WITH RECURSIVE shared_entities AS (
     SELECT 
-        fe.file_id,
-        fe.file_name,
-        fe.upload_date,
-        fe.size,
-        fe.parent,
-        fe.deleted_date,
-        fe.file_owner,
-        fe.is_folder,
-        fe.unique_filename,
-        fe.entity_link,
-        fe.modified_date,
-        sf.permission
-    FROM shared_files sf
-    INNER JOIN filesystem_entity fe ON sf.file_id = fe.file_id
-    WHERE sf.user_id = $1 AND fe.deleted_date IS NULL
+        filesystem_entity.file_id,
+        filesystem_entity.file_name,
+        filesystem_entity.upload_date,
+        filesystem_entity.size,
+        filesystem_entity.parent,
+        filesystem_entity.deleted_date,
+        filesystem_entity.file_owner,
+        filesystem_entity.is_folder,
+        filesystem_entity.unique_filename,
+        filesystem_entity.entity_link,
+        filesystem_entity.modified_date,
+        shared_files.permission
+    FROM shared_files 
+    INNER JOIN filesystem_entity filesystem_entity ON shared_files.file_id = filesystem_entity.file_id
+    WHERE shared_files.user_id = $1 AND filesystem_entity.deleted_date IS NULL
 
     UNION
 
     SELECT 
-        fe.file_id,
-        fe.file_name,
-        fe.upload_date,
-        fe.size,
-        fe.parent,
-        fe.deleted_date,
-        fe.file_owner,
-        fe.is_folder,
-        fe.unique_filename,
-        fe.entity_link,
-        fe.modified_date,
-        se.permission
-    FROM filesystem_entity fe
-    INNER JOIN shared_entities se ON fe.parent = se.file_id
-    WHERE se.is_folder = true AND fe.deleted_date IS NULL
+        filesystem_entity.file_id,
+        filesystem_entity.file_name,
+        filesystem_entity.upload_date,
+        filesystem_entity.size,
+        filesystem_entity.parent,
+        filesystem_entity.deleted_date,
+        filesystem_entity.file_owner,
+        filesystem_entity.is_folder,
+        filesystem_entity.unique_filename,
+        filesystem_entity.entity_link,
+        filesystem_entity.modified_date,
+        shared_entities.permission
+    FROM filesystem_entity 
+    INNER JOIN shared_entities ON filesystem_entity.parent = shared_entities.file_id
+    WHERE shared_entities.is_folder = true AND filesystem_entity.deleted_date IS NULL
 )
 SELECT * FROM shared_entities
 WHERE deleted_date IS NULL;
@@ -49,7 +48,7 @@ WHERE deleted_date IS NULL;
     const result = await db.query(query, [userId]);
     return result.rows;
   } catch (err) {
-    console.error("Error:", err);
+    console.error(err);
     throw err;
   }
 };
@@ -63,7 +62,7 @@ const getSharedFolderFiles = async (userId, parent) => {
     const result = await db.query(query, [userId, parent]);
     return result.rows;
   } catch (err) {
-    console.error("Error:", err);
+    console.error(err);
     throw err;
   }
 };
@@ -74,6 +73,7 @@ const checkPermissionExist = async (userId, entityId) => {
     const result = await db.query(query, [userId, entityId]);
     return result.rows;
   } catch (err) {
+    console.error(err);
     throw err;
   }
 };
@@ -111,6 +111,7 @@ const grantPermission = async (userId, folderId, permission) => {
       await db.query(insertQuery, [userId, entityId, permission]);
     }
   } catch (err) {
+    console.error(err);
     throw err;
   }
 };
@@ -128,7 +129,7 @@ const getUserIdToShare = async (email) => {
       console.log("User Not Found");
     }
   } catch (err) {
-    console.error("Error:", err);
+    console.error(err);
     throw err;
   }
 };
@@ -139,7 +140,7 @@ const saveSharedLink = async (permissionId, sharedLink) => {
     const result = await db.query(query, [sharedLink, permissionId]);
     return result;
   } catch (err) {
-    console.error("Error saving shared link:", err);
+    console.error(err);
     throw err;
   }
 };
@@ -156,11 +157,12 @@ const getSharedUsers = async (entity_id) => {
     const result = await db.query(query, [entity_id]);
     return result.rows;
   } catch (err) {
+    console.error(err);
     throw err;
   }
 };
 
-const removeAccessFromOwner = async (user_id, entity_id) => {
+const removeAccesshared_filesromOwner = async (user_id, entity_id) => {
   try {
     const query = `DELETE FROM shared_files
                     USING filesystem_entity
@@ -170,7 +172,7 @@ const removeAccessFromOwner = async (user_id, entity_id) => {
     const result = await db.query(query, [user_id, entity_id]);
     return result.rows;
   } catch (err) {
-    console.error("Error getting shared users:", err);
+    console.error(err);
     throw err;
   }
 };
@@ -198,7 +200,7 @@ const getChildFromParent = async (parent) => {
     const result = await db.query(query, [parent]);
     return result.rows;
   } catch (error) {
-    console.error("Error downloading file:", error);
+    console.error(err);
     throw error;
   }
 };
@@ -221,6 +223,7 @@ const handleNewUpload = async (fileId, parent, userId) => {
       }
     }
   } catch (error) {
+    console.error(err);
     throw error;
   }
 };
@@ -233,7 +236,7 @@ const changePermission = async (permission, userId, entityId) => {
     const result = await db.query(query, [permission, userId, entityId]);
     return result.rows[0];
   } catch (error) {
-    console.error("Error downloading file:", error);
+    console.error(err);
     throw error;
   }
 };
@@ -247,7 +250,7 @@ module.exports = {
   checkPermissionExist,
   getSharedUsers,
   removeSharedAccess,
-  removeAccessFromOwner,
+  removeAccesshared_filesromOwner,
   handleNewUpload,
   fileModel,
   getChildFromParent,

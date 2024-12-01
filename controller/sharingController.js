@@ -69,7 +69,7 @@ router.post("/removeAccess", jwt.authenticate, async (req, res) => {
     res.status(200).send();
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error");
+    res.status(500).send();
   }
 });
 
@@ -88,7 +88,7 @@ router.get("/shared-files", jwt.authenticate, async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error");
+    res.status(500).send();
   }
 });
 
@@ -100,7 +100,6 @@ router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
   const entityId = getId.file_id;
   try {
     const isFolder = await files.checkEntityType(entityId);
-    console.log(isFolder);
     if (isFolder) {
       await sharing.removeSharedAccess(userId, entityId);
       const childrenEntity = await files.getChildFromParent(entityId);
@@ -117,7 +116,7 @@ router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
     res.status(200).send();
   } catch (err) {
     console.error(err);
-    res.status(500).send("Error");
+    res.status(500).send();
   }
 });
 
@@ -139,7 +138,7 @@ router.post("/renameSharedFile", jwt.authenticate, async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).send();
   }
 });
 
@@ -162,7 +161,7 @@ router.get("/sharedFolder/:folderId", jwt.authenticate, async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    res.status(500).send("Server Error");
+    res.status(500).send();
   }
 });
 
@@ -177,7 +176,7 @@ router.post("/changePermission", jwt.authenticate, async (req, res) => {
     } else if (changedPermission === "edit") {
       permissionType = "rw";
     } else {
-      res.status(500).send("error");
+      res.status(500).send();
     }
     const result = await sharing.changePermission(
       permissionType,
