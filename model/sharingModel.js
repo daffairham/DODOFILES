@@ -6,43 +6,47 @@ const getSharedFiles = async (userId) => {
   try {
     const query = `
       WITH RECURSIVE shared_entities AS (
+    -- Ambil semua entitas yang dibagikan langsung
     SELECT 
-        filesystem_entity.file_id,
-        filesystem_entity.file_name,
-        filesystem_entity.upload_date,
-        filesystem_entity.size,
-        filesystem_entity.parent,
-        filesystem_entity.deleted_date,
-        filesystem_entity.file_owner,
-        filesystem_entity.is_folder,
-        filesystem_entity.unique_filename,
-        filesystem_entity.entity_link,
-        filesystem_entity.modified_date,
-        shared_files.permission
-    FROM shared_files
-    INNER JOIN filesystem_entity ON shared_files.file_id = filesystem_entity.file_id
-    WHERE shared_files.user_id = $1
+        fe.file_id,
+        fe.file_name,
+        fe.upload_date,
+        fe.size,
+        fe.parent,
+        fe.deleted_date,
+        fe.file_owner,
+        fe.is_folder,
+        fe.unique_filename,
+        fe.entity_link,
+        fe.modified_date,
+        sf.permission
+    FROM shared_files sf
+    INNER JOIN filesystem_entity fe ON sf.file_id = fe.file_id
+    WHERE sf.user_id = $1 AND fe.deleted_date IS NULL
 
     UNION
 
+    -- Rekursi: Ambil semua anak dari folder-folder yang dibagikan
     SELECT 
-        filesystem_entity.file_id,
-        filesystem_entity.file_name,
-        filesystem_entity.upload_date,
-        filesystem_entity.size,
-        filesystem_entity.parent,
-        filesystem_entity.deleted_date,
-        filesystem_entity.file_owner,
-        filesystem_entity.is_folder,
-        filesystem_entity.unique_filename,
-        filesystem_entity.entity_link,
-        filesystem_entity.modified_date,
-        shared_files.permission
-    FROM filesystem_entity 
-    INNER JOIN shared_entities ON filesystem_entity.parent = shared_entities.file_id
-    INNER JOIN shared_files ON filesystem_entity.file_id = shared_files.file_id
+        fe.file_id,
+        fe.file_name,
+        fe.upload_date,
+        fe.size,
+        fe.parent,
+        fe.deleted_date,
+        fe.file_owner,
+        fe.is_folder,
+        fe.unique_filename,
+        fe.entity_link,
+        fe.modified_date,
+        se.permission -- Izin diwariskan dari folder induk
+    FROM filesystem_entity fe
+    INNER JOIN shared_entities se ON fe.parent = se.file_id
+    WHERE se.is_folder = true AND fe.deleted_date IS NULL
 )
-SELECT * FROM shared_entities WHERE parent IS NULL AND deleted_date IS NULL;
+SELECT * FROM shared_entities
+WHERE deleted_date IS NULL;
+
     `;
 
     const result = await db.query(query, [userId]);

@@ -60,7 +60,7 @@ router.post("/removeAccess", jwt.authenticate, async (req, res) => {
       const childrenEntity = await files.getChildFromParent(entityId);
       for (const file_id of childrenEntity) {
         const id = await files.getEntityNameById(file_id.file_id);
-        await sharing.removeSharedAccess(userId, file_id.file_id); //hapus akses untuk entity dlm folder
+        await sharing.removeSharedAccess(userId, file_id.file_id);
       }
     } else {
       await sharing.removeSharedAccess(userId, entityId);
@@ -79,7 +79,6 @@ router.get("/shared-files", jwt.authenticate, async (req, res) => {
 
   try {
     const fileList = await sharing.getSharedFiles(userId);
-    console.log(fileList);
     res.render("sharedFiles", {
       fileList,
       userData,
@@ -93,23 +92,6 @@ router.get("/shared-files", jwt.authenticate, async (req, res) => {
   }
 });
 
-// router.get("/sharefile", jwt.authenticate, async (req, res) => {
-//   const entityId = req.query.fileid;
-//   const sharedUserLists = await sharing.getSharedUsers(entityId);
-//   const fileList = await files.getEntityDetailsById(entityId);
-//   try {
-//     // console.log(sharedUserLists);
-//     console.log(fileList[0]);
-//     res.render("parts/shareFileModal2", {
-//       sharedUserLists,
-//       file: fileList[0],
-//     });
-//   } catch (err) {
-//     console.error(err);
-//     res.status(500).send();
-//   }
-// });
-
 router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
   const userData = req.user;
   const userId = jwt.getIdFromToken(req.cookies.token);
@@ -117,22 +99,21 @@ router.post("/removeSharedFile", jwt.authenticate, async (req, res) => {
   const getId = await files.getEntityIdByName(entityName);
   const entityId = getId.file_id;
   try {
-    const entityTipe = await files.checkEntityType(entityId);
-    const isFolder = entityTipe.is_folder;
+    const isFolder = await files.checkEntityType(entityId);
     console.log(isFolder);
     if (isFolder) {
-      await sharing.removeSharedAccess(userId, entityName);
+      await sharing.removeSharedAccess(userId, entityId);
       const childrenEntity = await files.getChildFromParent(entityId);
       for (const file_id of childrenEntity) {
         const id = await files.getEntityNameById(file_id.file_id);
-        const childrenName = id.file_name;
-        await sharing.removeSharedAccess(userId, childrenName); //kasih akses untuk entity dlm folder
+        const childrenId = id.file_id;
+        await sharing.removeSharedAccess(userId, childrenId);
       }
     } else {
       const id = await files.getEntityIdByName(entityName);
       await sharing.removeSharedAccess(userId, id.file_id);
     }
-    sharing.removeSharedAccess(userId, entityName);
+    sharing.removeSharedAccess(userId, entityId);
     res.status(200).send();
   } catch (err) {
     console.error(err);
