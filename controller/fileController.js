@@ -236,7 +236,7 @@ router.post("/createFolder", jwt.authenticate, async (req, res) => {
     );
     if (folderLocation !== null) {
       await sharing.handleNewUpload(newFolder.file_id, folderLocation, userId);
-      res.redirect(`/folder/${parent}`);
+      res.redirect(`/folder/${folderLocation}`);
     } else {
       res.redirect(`/`);
     }

@@ -52,9 +52,7 @@ router.get("/folderTab", jwt.authenticate, async (req, res) => {
 
 router.get("/fileTab", jwt.authenticate, async (req, res) => {
   const userId = jwt.getIdFromToken(req.cookies.token);
-  const cl = req.params.folderId;
   const folderId = req.params.folderId;
-  console.log("id", cl);
   try {
     const folderList = await files.getUserFolder(userId);
     res.render("parts/uploadModal", { folderList, folderId });

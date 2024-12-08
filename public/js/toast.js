@@ -18,6 +18,17 @@ function moveFileToast(xhr) {
   }).showToast();
 }
 
+function createFolderToast() {
+  Toastify({
+    text: "Folder has been created.",
+    duration: 2000,
+    close: true,
+    gravity: "bottom",
+    position: "center",
+    backgroundColor: "#0CC0DF",
+  }).showToast();
+}
+
 function binToast() {
   Toastify({
     text: "File moved to recycle bin.",

@@ -5,7 +5,7 @@
     <button class="cursor-default rounded-md text-[#0CC0DF]">New Folder</button>
 </div>
 <form id="uploadForm" hx-post="/createFolder" hx-encoding="multipart/form-data" class="flex flex-col gap-2 mt-2"
-    onsubmit="closeModal()" hx-target=".main" hx-swap="outerHTML">
+    onsubmit="createFolderToast()" hx-target=".main" hx-swap="outerHTML">
     <label for="folder-name" class="text-[#8ba2a8]">Folder name:</label>
     <input type="text" name="folder-name" id="folder-name"
         class="border-[#0CC0DF] border-2 p-2 rounded-md focus:border-cyan-300">
